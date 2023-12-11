@@ -14,18 +14,19 @@ namespace DoCPathsGenerator
 
         public static string GetBaseBinaryValue(uint valToParse)
         {
-            var valHex = valToParse.ToString("X8");
-            var hexVal1Binary = Convert.ToString(Convert.ToUInt32(valHex[0] + "" + valHex[1], 16), 2).PadLeft(8, '0');
-            var hexVal2Binary = Convert.ToString(Convert.ToUInt32(valHex[2] + "" + valHex[3], 16), 2).PadLeft(8, '0');
-            var hexVal3Binary = Convert.ToString(Convert.ToUInt32(valHex[4] + "" + valHex[5], 16), 2).PadLeft(8, '0');
-            var hexVal4Binary = Convert.ToString(Convert.ToUInt32(valHex[6] + "" + valHex[7], 16), 2).PadLeft(8, '0');
+            var valArray = BitConverter.GetBytes(valToParse);
+            var val1Binary = Convert.ToString(valArray[3], 2).PadLeft(8, '0');
+            var val2Binary = Convert.ToString(valArray[2], 2).PadLeft(8,'0');
+            var val3Binary = Convert.ToString(valArray[1], 2).PadLeft(8,'0');
+            var val4Binary = Convert.ToString(valArray[0], 2).PadLeft(8,'0');
 
-            return hexVal1Binary + "" + hexVal2Binary + "" + hexVal3Binary + "" + hexVal4Binary;
+            return val1Binary + "" + val2Binary + "" + val3Binary + "" + val4Binary;
         }
 
         public static uint BinaryToUInt(string binaryVal, int startPosition, int count)
         {
             var binaryValSelected = binaryVal.Substring(startPosition, count);
+
             return Convert.ToUInt32(binaryValSelected, 2);
         }
 
