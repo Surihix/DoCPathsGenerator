@@ -18,7 +18,7 @@ namespace DoCPathsGenerator
 
             var unpackedFilelistDir = args[0];
             var unpackedKELdir = args[1];
-            var generatedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "generatedPaths");
+            var generatedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
             if (!File.Exists(Path.Combine(unpackedFilelistDir, "~Counts.txt")))
             {

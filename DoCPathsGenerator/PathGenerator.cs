@@ -92,6 +92,7 @@ namespace DoCPathsGenerator
 
                                             var isZoneTxtBin = subTypeVal == 0 && subTypeVal2 == 0 && index == 3;
                                             var isZoneLocaleTxtBin = subTypeVal == 0 && subTypeVal2 == 2;
+                                            var isZoneClass = subTypeVal == 0 && subTypeVal2 == 0 && index == 2;
 
 
                                             if (isZoneTxtBin)
@@ -115,6 +116,17 @@ namespace DoCPathsGenerator
                                                 CopyToGenPathDir(generatedFPath, currentFilePath);
                                                 pathsGenerated++;
                                             }
+
+                                            if (isZoneClass)
+                                            {
+                                                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.class");
+                                                Console.WriteLine(generatedVPath);
+
+                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+
+                                                CopyToGenPathDir(generatedFPath, currentFilePath);
+                                                pathsGenerated++;
+                                            }
                                             break;
 
                                         case 12:
@@ -127,6 +139,8 @@ namespace DoCPathsGenerator
 
                                             var isEventSceneTxtBinType0 = subTypeVal == 1 && subTypeVal2 == 0 && index < 8;
                                             var isEventSceneTxtBinType1 = subTypeVal == 1 && subTypeVal2 == 1 && index < 8;
+                                            var isEventSceneClassType0 = subTypeVal == 0 && subTypeVal2 == 0 && index < 8;
+                                            var isEventSceneClassType1 = subTypeVal == 0 && subTypeVal2 == 1 && index < 8;
                                             var isEventLocaleTxtBin = subTypeVal == 1 && subTypeVal2 == 25;
 
 
@@ -144,6 +158,28 @@ namespace DoCPathsGenerator
                                             if (isEventSceneTxtBinType1)
                                             {
                                                 generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
+                                                Console.WriteLine(generatedVPath);
+
+                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+
+                                                CopyToGenPathDir(generatedFPath, currentFilePath);
+                                                pathsGenerated++;
+                                            }
+
+                                            if (isEventSceneClassType0)
+                                            {
+                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
+                                                Console.WriteLine(generatedVPath);
+
+                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+
+                                                CopyToGenPathDir(generatedFPath, currentFilePath);
+                                                pathsGenerated++;
+                                            }
+
+                                            if (isEventSceneClassType1)
+                                            {
+                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
                                                 Console.WriteLine(generatedVPath);
 
                                                 generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
