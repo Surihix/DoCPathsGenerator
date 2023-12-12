@@ -15,19 +15,14 @@ namespace DoCPathsGenerator
         public static string GetBaseBinaryValue(uint valToParse)
         {
             var valArray = BitConverter.GetBytes(valToParse);
-            var val1Binary = Convert.ToString(valArray[3], 2).PadLeft(8, '0');
-            var val2Binary = Convert.ToString(valArray[2], 2).PadLeft(8,'0');
-            var val3Binary = Convert.ToString(valArray[1], 2).PadLeft(8,'0');
-            var val4Binary = Convert.ToString(valArray[0], 2).PadLeft(8,'0');
 
-            return val1Binary + "" + val2Binary + "" + val3Binary + "" + val4Binary;
+            return Convert.ToString(valArray[3], 2).PadLeft(8, '0') + "" + Convert.ToString(valArray[2], 2).PadLeft(8, '0') +
+                "" + Convert.ToString(valArray[1], 2).PadLeft(8, '0') + "" + Convert.ToString(valArray[0], 2).PadLeft(8, '0');
         }
 
         public static uint BinaryToUInt(string binaryVal, int startPosition, int count)
         {
-            var binaryValSelected = binaryVal.Substring(startPosition, count);
-
-            return Convert.ToUInt32(binaryValSelected, 2);
+            return Convert.ToUInt32(binaryVal.Substring(startPosition, count), 2);
         }
 
         public static string AppendZeroes(string type, uint folderNumber)
