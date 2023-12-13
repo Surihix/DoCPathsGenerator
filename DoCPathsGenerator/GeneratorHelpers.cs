@@ -1,25 +1,10 @@
 ﻿using System;
+using System.IO;
 
 namespace DoCPathsGenerator
 {
-    internal class Helpers
+    internal class GeneratorHelpers
     {
-        public static void ErrorExit(string errorMsg)
-        {
-            Console.WriteLine("");
-            Console.WriteLine($"Error: {errorMsg}");
-            Console.ReadLine();
-            Environment.Exit(0);
-        }
-
-        public static string GetBaseBinaryValue(uint valToParse)
-        {
-            var valArray = BitConverter.GetBytes(valToParse);
-
-            return Convert.ToString(valArray[3], 2).PadLeft(8, '0') + "" + Convert.ToString(valArray[2], 2).PadLeft(8, '0') +
-                "" + Convert.ToString(valArray[1], 2).PadLeft(8, '0') + "" + Convert.ToString(valArray[0], 2).PadLeft(8, '0');
-        }
-
         public static uint BinaryToUInt(string binaryVal, int startPosition, int count)
         {
             return Convert.ToUInt32(binaryVal.Substring(startPosition, count), 2);
@@ -62,6 +47,18 @@ namespace DoCPathsGenerator
             }
 
             return appendedStr;
+        }
+
+        public static void CopyFileToPath(string generatedVPath, string generatedPathsDir, string currentFPath)
+        {
+            Console.WriteLine(generatedVPath);
+
+            if (!Directory.Exists(Path.GetDirectoryName(Path.Combine(generatedPathsDir, generatedVPath))))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(generatedPathsDir, generatedVPath)));
+            }
+
+            File.Copy(currentFPath, Path.Combine(generatedPathsDir, generatedVPath));
         }
     }
 }

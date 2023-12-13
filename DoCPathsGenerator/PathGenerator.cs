@@ -18,40 +18,22 @@ namespace DoCPathsGenerator
                 Directory.Delete(generatedPathsDir, true);
             }
 
-            uint chunksCount;
-            using (var countsFileReader = new StreamReader(Path.Combine(unpackedFilelistDir, "~Counts.txt")))
-            {
-                _ = countsFileReader.ReadLine();
-                chunksCount = uint.Parse(countsFileReader.ReadLine());
-            }
+            uint chunksCount = uint.Parse(File.ReadAllLines(Path.Combine(unpackedFilelistDir, "~Counts.txt"))[1]);
 
             Console.WriteLine($"Total Chunks: {chunksCount}");
             Console.WriteLine("");
-            Thread.Sleep(1000);
+            Thread.Sleep(900);
 
-            int chunkFileNum = 0;
-            int emptyPathsCounter = 1;
+
+            var chunkFileNum = 0;
+            var emptyPathsCounter = 1;
+            var pathsGenerated = 0;
 
             int lineCount;
-            string currentChunkFile;
-            string[] currentLineData;
-            string currentFilePath;
-            uint fileCodeInfo;
-            string filePath;
-            string generatedVPath;
+            string currentChunkFile, currentFPath, filePath, generatedVPath, fileCodeBinaryVal, appendZeroes;
+            string[] currentChunkData, currentLineData;
 
-            string fileCodeBaseVal;
-            uint mainTypeVal;
-            uint zFolderNum;
-            uint evFolderNum;
-            uint subTypeVal;
-            uint subTypeVal2;
-            uint index;
-
-            string generatedFPath;
-            int pathsGenerated = 0;
-
-            string appendZeroes;
+            uint fileCode, mainTypeVal, zFolderNum, evFolderNum, subTypeVal, subTypeVal2, index;
 
             for (int i = 0; i < chunksCount; i++)
             {
@@ -59,151 +41,129 @@ namespace DoCPathsGenerator
 
                 if (File.Exists(currentChunkFile))
                 {
-                    lineCount = File.ReadAllLines(currentChunkFile).Length;
+                    currentChunkData = File.ReadAllLines(currentChunkFile);
+                    lineCount = currentChunkData.Length;
 
-                    using (var sr = new StreamReader(currentChunkFile))
+                    for (int l = 0; l < lineCount; l++)
                     {
+                        currentLineData = currentChunkData[l].Split(':');
+                        fileCode = uint.Parse(currentLineData[0].Split('|')[0]);
+                        filePath = currentLineData[3];
 
-                        for (int l = 0; l < lineCount; l++)
+                        if (filePath == null || filePath == " " || filePath == "")
                         {
-                            currentLineData = sr.ReadLine().Split(':');
-                            fileCodeInfo = uint.Parse(currentLineData[0].Split('|')[0]);
-                            filePath = currentLineData[3];
+                            filePath = $"FILE_{emptyPathsCounter}";
+                            currentFPath = Path.Combine(unpackedKELdir, "noPath", filePath);
 
-                            if (filePath == null || filePath == " " || filePath == "")
+                            if (File.Exists(currentFPath))
                             {
-                                filePath = $"FILE_{emptyPathsCounter}";
-                                currentFilePath = Path.Combine(unpackedKELdir, "noPath", filePath);
+                                var valueArray = BitConverter.GetBytes(fileCode);
+                                fileCodeBinaryVal = Convert.ToString(valueArray[3], 2).PadLeft(8, '0') + "" +
+                                    Convert.ToString(valueArray[2], 2).PadLeft(8, '0') + "" +
+                                    Convert.ToString(valueArray[1], 2).PadLeft(8, '0') + "" +
+                                    Convert.ToString(valueArray[0], 2).PadLeft(8, '0');
 
-                                if (File.Exists(currentFilePath))
+                                mainTypeVal = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 0, 8);
+
+                                switch (mainTypeVal)
                                 {
-                                    fileCodeBaseVal = Helpers.GetBaseBinaryValue(fileCodeInfo);
-                                    mainTypeVal = Helpers.BinaryToUInt(fileCodeBaseVal, 0, 8);
+                                    case 6:
+                                        zFolderNum = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 8, 8);
+                                        subTypeVal = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 16, 7);
+                                        subTypeVal2 = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 23, 5);
+                                        index = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 28, 4);
 
-                                    switch (mainTypeVal)
-                                    {
-                                        case 6:
-                                            zFolderNum = Helpers.BinaryToUInt(fileCodeBaseVal, 8, 8);
-                                            subTypeVal = Helpers.BinaryToUInt(fileCodeBaseVal, 16, 7);
-                                            subTypeVal2 = Helpers.BinaryToUInt(fileCodeBaseVal, 23, 5);
-                                            index = Helpers.BinaryToUInt(fileCodeBaseVal, 28, 4);
+                                        appendZeroes = GeneratorHelpers.AppendZeroes("zone", zFolderNum);
 
-                                            appendZeroes = Helpers.AppendZeroes("zone", zFolderNum);
-
-                                            var isZoneTxtBin = subTypeVal == 0 && subTypeVal2 == 0 && index == 3;
-                                            var isZoneLocaleTxtBin = subTypeVal == 0 && subTypeVal2 == 2;
-                                            var isZoneClass = subTypeVal == 0 && subTypeVal2 == 0 && index == 2;
+                                        var isZoneTxtBin = subTypeVal == 0 && subTypeVal2 == 0 && index == 3;
+                                        var isZoneLocaleTxtBin = subTypeVal == 0 && subTypeVal2 == 2;
+                                        var isZoneClass = subTypeVal == 0 && subTypeVal2 == 0 && index == 2;
 
 
-                                            if (isZoneTxtBin)
-                                            {
-                                                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
-                                                Console.WriteLine(generatedVPath);
+                                        if (isZoneTxtBin)
+                                        {
+                                            generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
+                                        if (isZoneLocaleTxtBin)
+                                        {
+                                            generatedVPath = Path.Combine(ZoneLocaleDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
 
-                                            if (isZoneLocaleTxtBin)
-                                            {
-                                                generatedVPath = Path.Combine(ZoneLocaleDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
-                                                Console.WriteLine(generatedVPath);
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                        if (isZoneClass)
+                                        {
+                                            generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.class");
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
+                                        break;
 
-                                            if (isZoneClass)
-                                            {
-                                                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.class");
-                                                Console.WriteLine(generatedVPath);
+                                    case 12:
+                                        evFolderNum = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 8, 12);
+                                        subTypeVal = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 20, 4);
+                                        subTypeVal2 = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 24, 5);
+                                        index = GeneratorHelpers.BinaryToUInt(fileCodeBinaryVal, 29, 3);
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                        appendZeroes = GeneratorHelpers.AppendZeroes("event", evFolderNum);
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
-                                            break;
-
-                                        case 12:
-                                            evFolderNum = Helpers.BinaryToUInt(fileCodeBaseVal, 8, 12);
-                                            subTypeVal = Helpers.BinaryToUInt(fileCodeBaseVal, 20, 4);
-                                            subTypeVal2 = Helpers.BinaryToUInt(fileCodeBaseVal, 24, 5);
-                                            index = Helpers.BinaryToUInt(fileCodeBaseVal, 29, 3);
-
-                                            appendZeroes = Helpers.AppendZeroes("event", evFolderNum);
-
-                                            var isEventSceneTxtBinType0 = subTypeVal == 1 && subTypeVal2 == 0 && index < 8;
-                                            var isEventSceneTxtBinType1 = subTypeVal == 1 && subTypeVal2 == 1 && index < 8;
-                                            var isEventSceneClassType0 = subTypeVal == 0 && subTypeVal2 == 0 && index < 8;
-                                            var isEventSceneClassType1 = subTypeVal == 0 && subTypeVal2 == 1 && index < 8;
-                                            var isEventLocaleTxtBin = subTypeVal == 1 && subTypeVal2 == 25;
+                                        var isEventSceneTxtBinType0 = subTypeVal == 1 && subTypeVal2 == 0 && index < 8;
+                                        var isEventSceneTxtBinType1 = subTypeVal == 1 && subTypeVal2 == 1 && index < 8;
+                                        var isEventSceneClassType0 = subTypeVal == 0 && subTypeVal2 == 0 && index < 8;
+                                        var isEventSceneClassType1 = subTypeVal == 0 && subTypeVal2 == 1 && index < 8;
+                                        var isEventLocaleTxtBin = subTypeVal == 1 && subTypeVal2 == 25;
 
 
-                                            if (isEventSceneTxtBinType0)
-                                            {
-                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
-                                                Console.WriteLine(generatedVPath);
+                                        if (isEventSceneTxtBinType0)
+                                        {
+                                            generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
+                                        if (isEventSceneTxtBinType1)
+                                        {
+                                            generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
-                                            if (isEventSceneTxtBinType1)
-                                            {
-                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
-                                                Console.WriteLine(generatedVPath);
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                        if (isEventSceneClassType0)
+                                        {
+                                            generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                            if (isEventSceneClassType0)
-                                            {
-                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
-                                                Console.WriteLine(generatedVPath);
+                                        if (isEventSceneClassType1)
+                                        {
+                                            generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
 
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
 
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
+                                        if (isEventLocaleTxtBin)
+                                        {
+                                            generatedVPath = Path.Combine(EventLocaleDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
-                                            if (isEventSceneClassType1)
-                                            {
-                                                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
-                                                Console.WriteLine(generatedVPath);
-
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
-
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
-
-                                            if (isEventLocaleTxtBin)
-                                            {
-                                                generatedVPath = Path.Combine(EventLocaleDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
-                                                Console.WriteLine(generatedVPath);
-
-                                                generatedFPath = Path.Combine(generatedPathsDir, generatedVPath);
-
-                                                CopyToGenPathDir(generatedFPath, currentFilePath);
-                                                pathsGenerated++;
-                                            }
-                                            break;
-                                    }
+                                            GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            pathsGenerated++;
+                                        }
+                                        break;
                                 }
-
-                                emptyPathsCounter++;
                             }
+
+                            emptyPathsCounter++;
                         }
                     }
                 }
@@ -213,15 +173,6 @@ namespace DoCPathsGenerator
 
             Console.WriteLine("");
             Console.WriteLine($"Total paths generated: {pathsGenerated}");
-        }
-
-        static void CopyToGenPathDir(string generatedFPath, string currentFilePath)
-        {
-            if (!Directory.Exists(Path.GetDirectoryName(generatedFPath)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(generatedFPath));
-            }
-            File.Copy(currentFilePath, generatedFPath);
         }
     }
 }

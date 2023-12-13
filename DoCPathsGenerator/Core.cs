@@ -22,33 +22,39 @@ namespace DoCPathsGenerator
 
             if (!File.Exists(Path.Combine(unpackedFilelistDir, "~Counts.txt")))
             {
-                Helpers.ErrorExit("Missing '~Counts.txt' file in the unpacked filelist directory");
+                ErrorExit("Missing '~Counts.txt' file in the unpacked filelist directory");
             }
 
             if (!Directory.Exists(unpackedFilelistDir))
             {
-                Helpers.ErrorExit("Specified filelist directory is missing");
+                ErrorExit("Specified filelist directory is missing");
             }
 
             if (!Directory.Exists(unpackedKELdir))
             {
-                Helpers.ErrorExit("Specified '_KEL.DAT' directory is missing");
+                ErrorExit("Specified '_KEL.DAT' directory is missing");
             }
-
-            PathGenerator.GeneratePaths(generatedPathsDir, unpackedFilelistDir, unpackedKELdir);
 
             try
             {
-
+                PathGenerator.GeneratePaths(generatedPathsDir, unpackedFilelistDir, unpackedKELdir);
             }
             catch (Exception ex)
             {
-                Helpers.ErrorExit($"An exception has occured\n{ex}");
+                ErrorExit($"An exception has occured\n{ex}");
             }
 
             Console.WriteLine("");
             Console.WriteLine("Finished generating paths");
             Console.ReadLine();
+        }
+
+        static void ErrorExit(string errorMsg)
+        {
+            Console.WriteLine("");
+            Console.WriteLine($"Error: {errorMsg}");
+            Console.ReadLine();
+            Environment.Exit(0);
         }
     }
 }
