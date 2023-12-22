@@ -1,5 +1,5 @@
 # DoCPathsGenerator
-This a companion tool of sorts for helping in generating paths for files that do not have a virtual path defined in the KEL.DAT archive's filelist file from the game Dirge Of Cerberus Final Fantasy VII.
+This a companion tool of sorts that helps in generating paths for files that do not have a virtual path defined in the filelist file from the game Dirge Of Cerberus Final Fantasy VII.
 
 Please refer to this page for the instructions on using this program:
 <br>https://github.com/Surihix/DoCPathsGenerator/blob/master/Docs/ToolUsage.md
