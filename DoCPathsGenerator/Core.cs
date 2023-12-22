@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace DoCPathsGenerator
 {
@@ -25,6 +26,11 @@ namespace DoCPathsGenerator
                 ErrorExit("Missing '~Counts.txt' file in the unpacked filelist directory");
             }
 
+            if (new FileInfo(Path.Combine(unpackedFilelistDir, "~Counts.txt")).Length == 0)
+            {
+                ErrorExit("'~Counts.txt' file does not contain any data");
+            }
+
             if (!Directory.Exists(unpackedFilelistDir))
             {
                 ErrorExit("Specified filelist directory is missing");
@@ -37,7 +43,21 @@ namespace DoCPathsGenerator
 
             try
             {
-                PathGenerator.GeneratePaths(generatedPathsDir, unpackedFilelistDir, unpackedKELdir);
+                var linesCount = File.ReadAllLines(Path.Combine(unpackedFilelistDir, "~Counts.txt")).Count();
+
+                if (linesCount < 2)
+                {
+                    ErrorExit("~Counts.txt file does not contain two lines");
+                }
+
+                var isCountsValid = uint.TryParse(File.ReadAllLines(Path.Combine(unpackedFilelistDir, "~Counts.txt"))[1], out uint chunksCount);
+
+                if (!isCountsValid)
+                {
+                    ErrorExit("~Counts.txt file does not contain a valid chunk count value");
+                }
+
+                PathGenerator.GeneratePaths(chunksCount, generatedPathsDir, unpackedFilelistDir, unpackedKELdir);
             }
             catch (Exception ex)
             {

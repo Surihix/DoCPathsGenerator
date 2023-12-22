@@ -7,7 +7,7 @@ namespace DoCPathsGenerator
 {
     internal class PathGenerator
     {
-        public static void GeneratePaths(string generatedPathsDir, string unpackedFilelistDir, string unpackedKELdir)
+        public static void GeneratePaths(uint chunksCount, string generatedPathsDir, string unpackedFilelistDir, string unpackedKELdir)
         {
             Console.WriteLine("");
 
@@ -17,8 +17,6 @@ namespace DoCPathsGenerator
                 Console.WriteLine("");
                 Directory.Delete(generatedPathsDir, true);
             }
-
-            uint chunksCount = uint.Parse(File.ReadAllLines(Path.Combine(unpackedFilelistDir, "~Counts.txt"))[1]);
 
             Console.WriteLine($"Total Chunks: {chunksCount}");
             Console.WriteLine("");
