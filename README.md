@@ -2,7 +2,7 @@
 This a companion tool of sorts for helping in generating paths for files that do not have a virtual path defined in the KEL.DAT archive's filelist file from the game Dirge Of Cerberus Final Fantasy VII.
 
 Please refer to this page for the instructions on using this program:
-https://github.com/Surihix/DoCPathsGenerator/blob/master/Docs/ToolUsage.md
+<br>https://github.com/Surihix/DoCPathsGenerator/blob/master/Docs/ToolUsage.md
 
 ## Important
 - Currently this program will generate the paths only for the text bin files and the class files. more path generation support might get added when I discover how the algorithm works for the other files.
@@ -10,4 +10,4 @@ https://github.com/Surihix/DoCPathsGenerator/blob/master/Docs/ToolUsage.md
 
 ## For Developers
 - The path generation algorithm can be found here:
-  https://github.com/DoC-Research/Documentation/wiki/%5BResearch%5D-Filecode-and-Path-generation-algorithm
+  <br>https://github.com/DoC-Research/Documentation/wiki/%5BResearch%5D-Filecode-and-Path-generation-algorithm
