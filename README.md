@@ -10,4 +10,4 @@ Please refer to this page for the instructions on using this program:
 
 ## For Developers
 - The path generation algorithm can be found here:
-  <br>https://github.com/DoC-Research/Documentation/wiki/%5BResearch%5D-Filecode-and-Path-generation-algorithm
+  <br>https://github.com/DoC-Research/Documentation/wiki/%5BResearch%5D-Filecode-and-Path-generation-logic
