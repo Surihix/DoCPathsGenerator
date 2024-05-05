@@ -28,7 +28,7 @@ namespace DoCPathsGenerator
             var pathsGenerated = 0;
 
             int lineCount;
-            string currentChunkFile, currentFPath, filePath, generatedVPath, fileCodeBinaryVal, appendZeroes;
+            string currentChunkFile, currentFPath, filePath, generatedVPath, fileCodeBinaryVal, appendZeroes, generatedFName;
             string[] currentChunkData, currentLineData;
 
             uint fileCode, mainTypeVal, zFolderNum, evFolderNum, subTypeVal, subTypeVal2, index;
@@ -83,6 +83,7 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, "gmap_str.bin");
                                             pathsGenerated++;
                                         }
 
@@ -91,6 +92,9 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(ZoneLocaleDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.bin");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+
+                                            generatedFName = GeneratorHelpers.ComputeFNameLanguage(index, "gmap_str");
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, generatedFName);
                                             pathsGenerated++;
                                         }
 
@@ -99,6 +103,7 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{zFolderNum}", $"{filePath}.class");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, "gmap.class");
                                             pathsGenerated++;
                                         }
                                         break;
@@ -123,6 +128,9 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            
+                                            generatedFName = GeneratorHelpers.ComputeFNameNum(index, "string", "bin");
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, generatedFName);
                                             pathsGenerated++;
                                         }
 
@@ -131,6 +139,7 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, "string08.bin");
                                             pathsGenerated++;
                                         }
 
@@ -139,6 +148,8 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            generatedFName = GeneratorHelpers.ComputeFNameNum(index, "scr0", "class");
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, generatedFName);
                                             pathsGenerated++;
                                         }
 
@@ -147,6 +158,7 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.class");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, "scr008.class");
                                             pathsGenerated++;
                                         }
 
@@ -155,6 +167,9 @@ namespace DoCPathsGenerator
                                             generatedVPath = Path.Combine(EventLocaleDir, $"ev{appendZeroes}{evFolderNum}", $"{filePath}.bin");
 
                                             GeneratorHelpers.CopyFileToPath(generatedVPath, generatedPathsDir, currentFPath);
+
+                                            generatedFName = GeneratorHelpers.ComputeFNameLanguage(index, "string");
+                                            GeneratorHelpers.WriteMapping(generatedPathsDir, generatedVPath, generatedFName);
                                             pathsGenerated++;
                                         }
                                         break;
