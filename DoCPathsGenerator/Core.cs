@@ -74,7 +74,7 @@ namespace DoCPathsGenerator
             Console.WriteLine("");
             Console.WriteLine($"Error: {errorMsg}");
             Console.ReadLine();
-            Environment.Exit(0);
+            Environment.Exit(1);
         }
     }
 }
