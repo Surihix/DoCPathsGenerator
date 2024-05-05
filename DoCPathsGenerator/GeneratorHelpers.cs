@@ -153,16 +153,16 @@ namespace DoCPathsGenerator
 
         public static void WriteMapping(string generatedPathsDir, string generatedVPath, string generatedFName)
         {
-            var mappingFile = Path.Combine(generatedPathsDir, Path.GetDirectoryName(generatedVPath), "#Names.txt");
-            if (!File.Exists(mappingFile))
+            var namesFile = Path.Combine(generatedPathsDir, Path.GetDirectoryName(generatedVPath), "#Names.txt");
+            if (!File.Exists(namesFile))
             {
-                File.WriteAllText(mappingFile, $"{Path.GetFileName(generatedVPath)} = {generatedFName}");
+                File.WriteAllText(namesFile, $"{Path.GetFileName(generatedVPath)} = {generatedFName}");
             }
             else
             {
-                var mappingData = File.ReadAllText(mappingFile);
+                var mappingData = File.ReadAllText(namesFile);
                 mappingData += $"\n{Path.GetFileName(generatedVPath)} = {generatedFName}";
-                File.WriteAllText(mappingFile, mappingData);
+                File.WriteAllText(namesFile, mappingData);
             }
         }
     }
