@@ -70,7 +70,7 @@ namespace DoCPathsGenerator
                 string fileCodeBinaryVal;
                 uint mainTypeVal;
 
-                var generatedPathsDict = new Dictionary<string, List<(string, string)>>();
+                var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
 
                 var fileCounter = uint.MinValue;
 
@@ -161,6 +161,7 @@ namespace DoCPathsGenerator
                                 switch (mainTypeVal)
                                 {
                                     case 6:
+                                        ZoneDirs.FileCode = fileCode;
                                         ZoneDirs.ZFolderNum = fileCodeBinaryVal.BinaryToUInt(8, 8);
                                         ZoneDirs.SubTypeVal = fileCodeBinaryVal.BinaryToUInt(16, 7);
                                         ZoneDirs.SubTypeVal2 = fileCodeBinaryVal.BinaryToUInt(23, 5);
@@ -170,6 +171,7 @@ namespace DoCPathsGenerator
                                         break;
 
                                     case 12:
+                                        EventDirs.FileCode = fileCode;
                                         EventDirs.EvFolderNum = fileCodeBinaryVal.BinaryToUInt(8, 12);
                                         EventDirs.SubTypeVal = fileCodeBinaryVal.BinaryToUInt(20, 4);
                                         EventDirs.SubTypeVal2 = fileCodeBinaryVal.BinaryToUInt(24, 5);
@@ -222,9 +224,14 @@ namespace DoCPathsGenerator
 
                         foreach (var values in generatedPathsDict[key])
                         {
+                            jsonWriter.Write("               { ");
+                            jsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
+                            jsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
+                            jsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
+
                             if (values == lastValueSet)
                             {
-                                jsonWriter.WriteLine("               { \"fileName\": " + "\"" + values.Item1 + "\", " + "\"virtualPath\": " + "\"" + values.Item2 + "\" }");
+                                jsonWriter.WriteLine("}");
 
                                 if (key == LastKey)
                                 {
@@ -238,7 +245,7 @@ namespace DoCPathsGenerator
                             }
                             else
                             {
-                                jsonWriter.WriteLine("               { \"fileName\": " + "\"" + values.Item1 + "\", " + "\"virtualPath\": " + "\"" + values.Item2 + "\" },");
+                                jsonWriter.WriteLine("},");
                             }
                         }
                     }

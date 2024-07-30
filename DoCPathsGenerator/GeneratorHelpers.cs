@@ -68,7 +68,7 @@ namespace DoCPathsGenerator
         }
 
 
-        public static void ProcessGeneratedPath(string virtualPath, string noPathFile, Dictionary<string, List<(string, string)>> generatedPathsDict, string currentChunk)
+        public static void ProcessGeneratedPath(string virtualPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk, uint fileCode)
         {
             var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDirSet, Path.GetDirectoryName(virtualPath));
             if (!Directory.Exists(dirInGenPathsDir))
@@ -80,16 +80,15 @@ namespace DoCPathsGenerator
 
             if (generatedPathsDict.ContainsKey(currentChunk))
             {
-                generatedPathsDict[currentChunk].Add((Path.GetFileName(noPathFile), virtualPath));
+                generatedPathsDict[currentChunk].Add((fileCode, Path.GetFileName(noPathFile), virtualPath));
             }
             else
             {
-                generatedPathsDict.Add(currentChunk, new List<(string, string)>());
-                generatedPathsDict[currentChunk].Add((Path.GetFileName(noPathFile), virtualPath));
+                generatedPathsDict.Add(currentChunk, new List<(uint, string, string)>());
+                generatedPathsDict[currentChunk].Add((fileCode, Path.GetFileName(noPathFile), virtualPath));
             }
 
             Console.WriteLine($"Generated: {virtualPath.Replace("\\", "/")}");
-
         }
 
 

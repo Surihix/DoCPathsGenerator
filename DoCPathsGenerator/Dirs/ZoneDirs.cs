@@ -8,12 +8,13 @@ namespace DoCPathsGenerator.Dirs
     internal class ZoneDirs
     {
         // Main variables
+        public static uint FileCode { get; set; }
         public static uint ZFolderNum { get; set; }
         public static uint SubTypeVal { get; set; }
         public static uint SubTypeVal2 { get; set; }
         public static uint Index { get; set; }
 
-        public static void ProcessZonePath(string noPathFile, Dictionary<string, List<(string, string)>> generatedPathsDict, string currentChunk)
+        public static void ProcessZonePath(string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk)
         {
             var appendZeroes = GeneratorHelpers.AppendZeroes("zone", ZFolderNum);
 
@@ -34,7 +35,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "zone.cnf");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -43,7 +44,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "bzd.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -52,7 +53,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "gmap.class");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -61,7 +62,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "gmap_str.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -70,7 +71,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "brd.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -79,7 +80,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "sound", "sep.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -88,7 +89,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "shp.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -97,7 +98,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "sdb.bin");
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
 
@@ -108,7 +109,7 @@ namespace DoCPathsGenerator.Dirs
                 generatedVPath = Path.Combine(ZoneLocaleDir, $"z{appendZeroes}{ZFolderNum}", generatedFName);
 
                 LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk);
+                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
                 PathsGenerated++;
             }
         }
