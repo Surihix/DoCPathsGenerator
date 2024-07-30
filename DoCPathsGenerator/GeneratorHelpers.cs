@@ -1,13 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace DoCPathsGenerator
 {
     internal class GeneratorHelpers
     {
-        public static uint BinaryToUInt(string binaryVal, int startPosition, int count)
+        public static void ErrorExit(string errorMsg)
         {
-            return Convert.ToUInt32(binaryVal.Substring(startPosition, count), 2);
+            Console.WriteLine("");
+            Console.WriteLine($"Error: {errorMsg}");
+            Console.ReadLine();
+            Environment.Exit(1);
+        }
+
+
+        public static string CheckParseJsonProperty(StreamReader jsonReader, string propertyValue, string errorMsg)
+        {
+            var valueRead = jsonReader.ReadLine().TrimStart(' ');
+
+            if (!valueRead.StartsWith(propertyValue))
+            {
+                ErrorExit(errorMsg);
+            }
+
+            return valueRead;
         }
 
 
@@ -51,16 +68,28 @@ namespace DoCPathsGenerator
         }
 
 
-        public static void CopyFileToPath(string generatedVPath, string generatedPathsDir, string currentFPath)
+        public static void ProcessGeneratedPath(string virtualPath, string noPathFile, Dictionary<string, List<(string, string)>> generatedPathsDict, string currentChunk)
         {
-            Console.WriteLine(generatedVPath);
-
-            if (!Directory.Exists(Path.GetDirectoryName(Path.Combine(generatedPathsDir, generatedVPath))))
+            var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDirSet, Path.GetDirectoryName(virtualPath));
+            if (!Directory.Exists(dirInGenPathsDir))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(generatedPathsDir, generatedVPath)));
+                Directory.CreateDirectory(dirInGenPathsDir);
             }
 
-            File.Copy(currentFPath, Path.Combine(generatedPathsDir, generatedVPath));
+            File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDirSet, virtualPath));
+
+            if (generatedPathsDict.ContainsKey(currentChunk))
+            {
+                generatedPathsDict[currentChunk].Add((Path.GetFileName(noPathFile), virtualPath));
+            }
+            else
+            {
+                generatedPathsDict.Add(currentChunk, new List<(string, string)>());
+                generatedPathsDict[currentChunk].Add((Path.GetFileName(noPathFile), virtualPath));
+            }
+
+            Console.WriteLine($"Generated: {virtualPath.Replace("\\", "/")}");
+
         }
 
 
@@ -148,22 +177,6 @@ namespace DoCPathsGenerator
             }
 
             return generatedFName;
-        }
-
-
-        public static void WriteMapping(string generatedPathsDir, string generatedVPath, string generatedFName)
-        {
-            var namesFile = Path.Combine(generatedPathsDir, Path.GetDirectoryName(generatedVPath), "#Names.txt");
-            if (!File.Exists(namesFile))
-            {
-                File.WriteAllText(namesFile, $"{Path.GetFileName(generatedVPath)} = {generatedFName}");
-            }
-            else
-            {
-                var mappingData = File.ReadAllText(namesFile);
-                mappingData += $"\n{Path.GetFileName(generatedVPath)} = {generatedFName}";
-                File.WriteAllText(namesFile, mappingData);
-            }
         }
     }
 }

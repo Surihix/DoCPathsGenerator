@@ -43,7 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DoCPathsGenerator\PathGenerator.cs" />
+    <Compile Include="DoCPathsGenerator\Dirs\EventDirs.cs" />
+    <Compile Include="DoCPathsGenerator\Extensions\BitOperationHelpers.cs" />
+    <Compile Include="DoCPathsGenerator\Dirs\ZoneDirs.cs" />
+    <Compile Include="DoCPathsGenerator\PathsGenerator.cs" />
     <Compile Include="DoCPathsGenerator\PathStructures.cs" />
     <Compile Include="DoCPathsGenerator\GeneratorHelpers.cs" />
     <Compile Include="DoCPathsGenerator\Core.cs" />
