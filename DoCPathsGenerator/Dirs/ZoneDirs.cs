@@ -7,111 +7,107 @@ namespace DoCPathsGenerator.Dirs
 {
     internal class ZoneDirs
     {
-        // Main variables
         public static uint FileCode { get; set; }
-        public static uint ZFolderNum { get; set; }
-        public static uint SubTypeVal { get; set; }
-        public static uint SubTypeVal2 { get; set; }
-        public static uint Index { get; set; }
+        public static string FileCodeBinary { get; set; }
+
+        private static uint _zFolderNum;
+        private static uint _subTypeVal;
+        private static uint _subTypeVal2;
+        private static uint _index;
 
         public static void ProcessZonePath(string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk)
         {
-            var appendZeroes = GeneratorHelpers.AppendZeroes("zone", ZFolderNum);
+            _zFolderNum = FileCodeBinary.BinaryToUInt(8, 8);
+            _subTypeVal = FileCodeBinary.BinaryToUInt(16, 7);
+            _subTypeVal2 = FileCodeBinary.BinaryToUInt(23, 5);
+            _index = FileCodeBinary.BinaryToUInt(28, 4);
 
-            var isZoneCnf = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 0;
-            var isZoneBzdBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 1;
-            var isZoneClass = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 2;
-            var isZoneStrBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 3;
-            var isZoneBrdBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 4;
-            var isZoneSepBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 5;
-            var isZoneShpBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 6;
-            var isZoneSdbBin = SubTypeVal == 0 && SubTypeVal2 == 0 && Index == 8;
-            var isZoneLocaleStrBin = SubTypeVal == 0 && SubTypeVal2 == 2;
+            var zFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("z", _zFolderNum, 3);
+
+            var isZoneCnf = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 0;
+            var isZoneBzdBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 1;
+            var isZoneClass = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 2;
+            var isZoneStrBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 3;
+            var isZoneBrdBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 4;
+            var isZoneSepBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 5;
+            var isZoneShpBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 6;
+            var isZoneSdbBin = _subTypeVal == 0 && _subTypeVal2 == 0 && _index == 8;
+            var isZoneLocaleStrBin = _subTypeVal == 0 && _subTypeVal2 == 2;
 
             string generatedVPath;
 
             if (isZoneCnf)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "zone.cnf");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "zone.cnf");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneBzdBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "bzd.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "bzd.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneClass)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "gmap.class");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "gmap.class");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneStrBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "gmap_str.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "gmap_str.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneBrdBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "brd.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "brd.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneSepBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "sound", "sep.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "sound", "sep.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneShpBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "shp.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "shp.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneSdbBin)
             {
-                generatedVPath = Path.Combine(ZoneDir, $"z{appendZeroes}{ZFolderNum}", "sdb.bin");
+                generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "sdb.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
 
             if (isZoneLocaleStrBin)
             {
-                var generatedFName = GeneratorHelpers.ComputeFNameLanguage(Index, "gmap_str");
+                var generatedFName = GeneratorHelpers.ComputeFNameLanguage(_index, "gmap_str");
 
-                generatedVPath = Path.Combine(ZoneLocaleDir, $"z{appendZeroes}{ZFolderNum}", generatedFName);
+                generatedVPath = Path.Combine(ZoneLocaleDir, zFolderNumPadded, generatedFName);
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
             }
+        }
+
+
+        private static void GenerateZonePath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
+        {
+            LastKey = currentChunk;
+            GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            PathsGenerated++;
         }
     }
 }

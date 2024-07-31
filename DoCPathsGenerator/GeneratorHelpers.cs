@@ -28,55 +28,15 @@ namespace DoCPathsGenerator
         }
 
 
-        public static string AppendZeroes(string type, uint folderNumber)
-        {
-            var appendedStr = "";
-
-            switch (type)
-            {
-                case "event":
-                    if (folderNumber < 10)
-                    {
-                        appendedStr = "000";
-                    }
-
-                    if (folderNumber >= 10 && folderNumber < 100)
-                    {
-                        appendedStr = "00";
-                    }
-
-                    if (folderNumber >= 100 && folderNumber < 1000)
-                    {
-                        appendedStr = "0";
-                    }
-                    break;
-
-                case "zone":
-                    if (folderNumber < 10)
-                    {
-                        appendedStr = "00";
-                    }
-
-                    if (folderNumber >= 10 && folderNumber < 100)
-                    {
-                        appendedStr = "0";
-                    }
-                    break;
-            }
-
-            return appendedStr;
-        }
-
-
         public static void ProcessGeneratedPath(string virtualPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk, uint fileCode)
         {
-            var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDirSet, Path.GetDirectoryName(virtualPath));
+            var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDir, Path.GetDirectoryName(virtualPath));
             if (!Directory.Exists(dirInGenPathsDir))
             {
                 Directory.CreateDirectory(dirInGenPathsDir);
             }
 
-            File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDirSet, virtualPath));
+            File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
 
             if (generatedPathsDict.ContainsKey(currentChunk))
             {
@@ -176,6 +136,18 @@ namespace DoCPathsGenerator
             }
 
             return generatedFName;
+        }
+
+
+        public static string GenerateFolderNameWithNumber(string fNamePattern, uint number, int padCount)
+        {
+            return fNamePattern + number.ToString().PadLeft(padCount, '0');
+        }
+
+
+        public static string GenerateFNameWithNumber(string fNamePattern, uint number, int padCount, string fExtn)
+        {
+            return fNamePattern + number.ToString().PadLeft(padCount, '0') + fExtn;
         }
     }
 }

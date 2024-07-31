@@ -7,73 +7,147 @@ namespace DoCPathsGenerator.Dirs
 {
     internal class EventDirs
     {
-        // Main variables
         public static uint FileCode { get; set; }
-        public static uint EvFolderNum { get; set; }
-        public static uint SubTypeVal { get; set; }
-        public static uint SubTypeVal2 { get; set; }
-        public static uint Index { get; set; }
+        public static string FileCodeBinary { get; set; }
+
+        private static uint _evFolderNum;
+        private static uint _subTypeVal;
+        private static uint _subTypeVal2;
+        private static uint _index;
 
         public static void ProcessEventPath(string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk)
         {
-            var appendZeroes = GeneratorHelpers.AppendZeroes("event", EvFolderNum);
+            _evFolderNum = FileCodeBinary.BinaryToUInt(8, 12);
+            _subTypeVal = FileCodeBinary.BinaryToUInt(20, 4);
 
-            var isEventSceneStrBinType0 = SubTypeVal == 1 && SubTypeVal2 == 0 && Index < 8;
-            var isEventSceneStrBinType1 = SubTypeVal == 1 && SubTypeVal2 == 1 && Index < 8;
-            var isEventSceneClassType0 = SubTypeVal == 0 && SubTypeVal2 == 0 && Index < 8;
-            var isEventSceneClassType1 = SubTypeVal == 0 && SubTypeVal2 == 1 && Index < 8;
-            var isEventLocaleTxtBin = SubTypeVal == 1 && SubTypeVal2 == 25;
+            var evFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("ev", _evFolderNum, 4);
 
-            string generatedVPath;
-            string generatedFName;
-
-            if (isEventSceneStrBinType0)
+            switch (_subTypeVal)
             {
-                generatedFName = GeneratorHelpers.ComputeFNameNum(Index, "string", "bin");
-                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{EvFolderNum}", generatedFName);
+                case 0:
+                case 1:
+                    _subTypeVal2 = FileCodeBinary.BinaryToUInt(24, 5);
+                    _index = FileCodeBinary.BinaryToUInt(29, 3);
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
+                    var isEventSceneStrBinType0 = _subTypeVal == 1 && _subTypeVal2 == 0 && _index < 8;
+                    var isEventSceneStrBinType1 = _subTypeVal == 1 && _subTypeVal2 == 1 && _index < 8;
+                    var isEventSceneClassType0 = _subTypeVal == 0 && _subTypeVal2 == 0 && _index < 8;
+                    var isEventSceneClassType1 = _subTypeVal == 0 && _subTypeVal2 == 1 && _index < 8;
+                    var isEventLocaleTxtBin = _subTypeVal == 1 && _subTypeVal2 == 25;
+
+                    string generatedVPath;
+                    string generatedFName;
+
+                    if (isEventSceneStrBinType0)
+                    {
+                        generatedFName = GeneratorHelpers.ComputeFNameNum(_index, "string", "bin");
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isEventSceneStrBinType1)
+                    {
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, "string08.bin");
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isEventSceneClassType0)
+                    {
+                        generatedFName = GeneratorHelpers.ComputeFNameNum(_index, "scr0", "class");
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isEventSceneClassType1)
+                    {
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, "scr008.class");
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isEventLocaleTxtBin)
+                    {
+                        generatedFName = GeneratorHelpers.ComputeFNameLanguage(_index, "string");
+                        generatedVPath = Path.Combine(EventLocaleDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+                    break;
+
+                case 2:
+                case 4:
+                    _index = FileCodeBinary.BinaryToUInt(24, 8);
+
+                    var isPtdBin = _subTypeVal == 2;
+                    var isEvmRfd = _subTypeVal == 4;
+
+                    if (isPtdBin)
+                    {
+                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("ptd", _index, 3, ".bin");
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isEvmRfd)
+                    {
+                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("evm", _index, 3, ".rfd");
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+                    break;
+
+                case 6:
+                case 8:
+                    _index = FileCodeBinary.BinaryToUInt(24, 8);
+
+                    var isTexRfd = _subTypeVal == 6;
+                    var isSepBin = _subTypeVal == 8;
+
+                    if (isTexRfd)
+                    {
+                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("tex", _index, 3, ".rfd");
+                        generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+
+                    if (isSepBin)
+                    {
+                        if (_index == 0)
+                        {
+                            generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, "sep.bin");
+                        }
+                        else
+                        {
+                            generatedFName = GeneratorHelpers.GenerateFNameWithNumber("sep", _index, 3, ".bin");
+                            generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
+                        }
+
+                        GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    }
+                    break;
+
+                case 9:
+                    _index = FileCodeBinary.BinaryToUInt(24, 8);
+
+                    generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, "evtvib.bin");
+
+                    GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                    break;
             }
+        }
 
-            if (isEventSceneStrBinType1)
-            {
-                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{EvFolderNum}", "string08.bin");
 
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
-            }
-
-            if (isEventSceneClassType0)
-            {
-                generatedFName = GeneratorHelpers.ComputeFNameNum(Index, "scr0", "class");
-                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{EvFolderNum}", generatedFName);
-
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
-            }
-
-            if (isEventSceneClassType1)
-            {
-                generatedVPath = Path.Combine(EventSceneDir, $"ev{appendZeroes}{EvFolderNum}", "scr008.class");
-
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
-            }
-
-            if (isEventLocaleTxtBin)
-            {
-                generatedFName = GeneratorHelpers.ComputeFNameLanguage(Index, "string");
-                generatedVPath = Path.Combine(EventLocaleDir, $"ev{appendZeroes}{EvFolderNum}", generatedFName);
-
-                LastKey = currentChunk;
-                GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
-                PathsGenerated++;
-            }
+        private static void GenerateEventPath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
+        {
+            LastKey = currentChunk;
+            GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            PathsGenerated++;
         }
     }
 }

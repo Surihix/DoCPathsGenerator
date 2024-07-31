@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DoCPathsGenerator\PathsChecker.cs" />
     <Compile Include="DoCPathsGenerator\Dirs\EventDirs.cs" />
     <Compile Include="DoCPathsGenerator\Extensions\BitOperationHelpers.cs" />
     <Compile Include="DoCPathsGenerator\Dirs\ZoneDirs.cs" />

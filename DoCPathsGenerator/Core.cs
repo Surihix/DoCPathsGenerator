@@ -7,36 +7,80 @@ namespace DoCPathsGenerator
     {
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            Console.WriteLine("");
+
+            if (args.Length < 3)
             {
                 Console.WriteLine("Enough arguments not specified\n");
-                Console.WriteLine("Example:");
-                Console.WriteLine("DoCPathsGenerator.exe [JSON file] [unpacked _KEL.DAT folder]");
+                Console.WriteLine("Examples:");
+                Console.WriteLine("DoCPathsGenerator.exe -g [FILELIST.BIN.json filePath] [unpacked _KEL.DAT folderPath]");
+                Console.WriteLine("DoCPathsGenerator.exe -c [unpacked _KEL.DAT folderPath] [#generatedPaths folder path]");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
 
-            var jsonFile = args[0];
-            var unpackedKELdir = args[1];
-
-            if (!File.Exists(jsonFile))
+            if (Enum.TryParse(args[0].Replace("-", ""), false, out ActionSwitches actionSwitch) == false)
             {
-                GeneratorHelpers.ErrorExit("Specified JSON file is missing");
+                Console.WriteLine("Warning: Specified tool action was invalid");
+                Console.ReadLine();
+                Environment.Exit(0);
             }
 
-            if (!Directory.Exists(unpackedKELdir))
+            string unpackedKELdir;
+
+            switch (actionSwitch)
             {
-                GeneratorHelpers.ErrorExit("Specified '_KEL.DAT' directory is missing");
+                case ActionSwitches.c:
+                    unpackedKELdir = args[1];
+                    var generatedPathsDir = args[2];
+
+                    if (!Directory.Exists(unpackedKELdir))
+                    {
+                        GeneratorHelpers.ErrorExit("Specified '_KEL.DAT' folder is missing");
+                    }
+
+                    if (!Directory.Exists(generatedPathsDir))
+                    {
+                        GeneratorHelpers.ErrorExit("Specified '_KEL.DAT' folder is missing");
+                    }
+
+                    PathsChecker.CheckAvailablePaths(unpackedKELdir, generatedPathsDir);
+
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.WriteLine("Finished checking paths");
+                    Console.ReadLine();
+                    break;
+
+                case ActionSwitches.g:
+                    var jsonFile = args[1];
+                    unpackedKELdir = args[2];
+
+                    if (!File.Exists(jsonFile))
+                    {
+                        GeneratorHelpers.ErrorExit("Specified 'FILELIST.BIN.json' file is missing");
+                    }
+
+                    if (!Directory.Exists(unpackedKELdir))
+                    {
+                        GeneratorHelpers.ErrorExit("Specified '_KEL.DAT' folder is missing");
+                    }
+
+                    PathsGenerator.GeneratePaths(jsonFile, unpackedKELdir);
+
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.WriteLine("Finished generating paths");
+                    Console.ReadLine();
+                    break;
             }
+        }
 
-            var generatedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
-            PathsGenerator.GeneratePaths(jsonFile, generatedPathsDir, unpackedKELdir);
-
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("Finished generating paths");
-            Console.ReadLine();
+        enum ActionSwitches
+        {
+            c,
+            g
         }
     }
 }

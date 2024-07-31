@@ -8,16 +8,16 @@ namespace DoCPathsGenerator
 {
     internal class PathsGenerator
     {
-        public static string GeneratedPathsDirSet { get; set; }
+        public static string GeneratedPathsDir { get; set; }
         public static string LastKey { get; set; }
 
         public static uint PathsGenerated = 0;
 
-        public static void GeneratePaths(string jsonFile, string generatedPathsDir, string unpackedKELdir)
+        public static void GeneratePaths(string jsonFile, string unpackedKELdir)
         {
             Console.WriteLine("");
 
-            GeneratedPathsDirSet = generatedPathsDir;
+            GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
             using (var jsonReader = new StreamReader(jsonFile))
             {
@@ -42,13 +42,15 @@ namespace DoCPathsGenerator
                 Console.WriteLine($"TotalChunks: {chunkCount}");
                 Console.WriteLine($"No of files: {fileCount}");
                 Console.WriteLine("");
-                Thread.Sleep(900);
+                Console.WriteLine("Generating....");
+                Console.WriteLine("");
+                Thread.Sleep(200);
 
                 tmpValueRead = GeneratorHelpers.CheckParseJsonProperty(jsonReader, "\"data\": {", "data property string in the json file is invalid");
 
-                if (Directory.Exists(generatedPathsDir))
+                if (Directory.Exists(GeneratedPathsDir))
                 {
-                    Directory.Delete(generatedPathsDir, true);
+                    Directory.Delete(GeneratedPathsDir, true);
                 }
 
 
@@ -162,20 +164,14 @@ namespace DoCPathsGenerator
                                 {
                                     case 6:
                                         ZoneDirs.FileCode = fileCode;
-                                        ZoneDirs.ZFolderNum = fileCodeBinaryVal.BinaryToUInt(8, 8);
-                                        ZoneDirs.SubTypeVal = fileCodeBinaryVal.BinaryToUInt(16, 7);
-                                        ZoneDirs.SubTypeVal2 = fileCodeBinaryVal.BinaryToUInt(23, 5);
-                                        ZoneDirs.Index = fileCodeBinaryVal.BinaryToUInt(28, 4);
+                                        ZoneDirs.FileCodeBinary = fileCodeBinaryVal;
 
                                         ZoneDirs.ProcessZonePath(noPathFile, generatedPathsDict, currentChunk);
                                         break;
 
                                     case 12:
                                         EventDirs.FileCode = fileCode;
-                                        EventDirs.EvFolderNum = fileCodeBinaryVal.BinaryToUInt(8, 12);
-                                        EventDirs.SubTypeVal = fileCodeBinaryVal.BinaryToUInt(20, 4);
-                                        EventDirs.SubTypeVal2 = fileCodeBinaryVal.BinaryToUInt(24, 5);
-                                        EventDirs.Index = fileCodeBinaryVal.BinaryToUInt(29, 3);
+                                        EventDirs.FileCodeBinary = fileCodeBinaryVal;
 
                                         EventDirs.ProcessEventPath(noPathFile, generatedPathsDict, currentChunk);
                                         break;
@@ -204,7 +200,7 @@ namespace DoCPathsGenerator
                 Console.WriteLine("");
                 Console.WriteLine("Generating JSON file....");
 
-                var outJsonFile = Path.Combine(generatedPathsDir, "FileMappings.json");
+                var outJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
 
                 if (File.Exists(outJsonFile))
                 {
