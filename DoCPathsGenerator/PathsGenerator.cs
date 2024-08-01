@@ -15,8 +15,6 @@ namespace DoCPathsGenerator
 
         public static void GeneratePaths(string jsonFile, string unpackedKELdir)
         {
-            Console.WriteLine("");
-
             GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
             using (var jsonReader = new StreamReader(jsonFile))
@@ -72,6 +70,7 @@ namespace DoCPathsGenerator
                 string fileCodeBinaryVal;
                 uint mainTypeVal;
 
+                var processedPathsList = new List<(string, uint)>();
                 var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
 
                 var fileCounter = uint.MinValue;
@@ -157,6 +156,8 @@ namespace DoCPathsGenerator
 
                             if (File.Exists(noPathFile))
                             {
+                                processedPathsList.Add(($"FILE_{noPathCounter}", fileCode));
+
                                 fileCodeBinaryVal = fileCode.UIntToBinary();
                                 mainTypeVal = fileCodeBinaryVal.BinaryToUInt(0, 8);
 
@@ -197,57 +198,80 @@ namespace DoCPathsGenerator
                 Console.WriteLine("");
                 Console.WriteLine($"Total paths generated: {PathsGenerated}");
 
+
                 Console.WriteLine("");
-                Console.WriteLine("Generating JSON file....");
+                Console.WriteLine("Generating JSON and txt files....");
 
-                var outJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
+                // Generate mappings json file
+                var outMappingsJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
 
-                if (File.Exists(outJsonFile))
+                if (File.Exists(outMappingsJsonFile))
                 {
-                    File.Delete(outJsonFile);
+                    File.Delete(outMappingsJsonFile);
                 }
 
-                using (var jsonWriter = new StreamWriter(outJsonFile, true))
+                using (var mappingsJsonWriter = new StreamWriter(outMappingsJsonFile, true))
                 {
-                    jsonWriter.WriteLine("{");
-                    jsonWriter.WriteLine("  \"pathCount\": " + PathsGenerated + ",");
-                    jsonWriter.WriteLine("  \"pathData\": {");
+                    mappingsJsonWriter.WriteLine("{");
+                    mappingsJsonWriter.WriteLine("  \"pathCount\": " + PathsGenerated + ",");
+                    mappingsJsonWriter.WriteLine("  \"pathData\": {");
 
                     foreach (var key in generatedPathsDict.Keys)
                     {
-                        jsonWriter.WriteLine($"             {key}: [");
+                        mappingsJsonWriter.WriteLine($"             {key}: [");
                         var lastValueSet = generatedPathsDict[key][generatedPathsDict[key].Count - 1];
 
                         foreach (var values in generatedPathsDict[key])
                         {
-                            jsonWriter.Write("               { ");
-                            jsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
-                            jsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
-                            jsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
+                            mappingsJsonWriter.Write("               { ");
+                            mappingsJsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
+                            mappingsJsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
+                            mappingsJsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
 
                             if (values == lastValueSet)
                             {
-                                jsonWriter.WriteLine("}");
+                                mappingsJsonWriter.WriteLine("}");
 
                                 if (key == LastKey)
                                 {
-                                    jsonWriter.WriteLine("             ]");
+                                    mappingsJsonWriter.WriteLine("             ]");
                                 }
                                 else
                                 {
-                                    jsonWriter.WriteLine("             ],");
-                                    jsonWriter.WriteLine("");
+                                    mappingsJsonWriter.WriteLine("             ],");
+                                    mappingsJsonWriter.WriteLine("");
                                 }
                             }
                             else
                             {
-                                jsonWriter.WriteLine("},");
+                                mappingsJsonWriter.WriteLine("},");
                             }
                         }
                     }
 
-                    jsonWriter.WriteLine("  }");
-                    jsonWriter.WriteLine("}");
+                    mappingsJsonWriter.WriteLine("  }");
+                    mappingsJsonWriter.WriteLine("}");
+                }
+
+                // Generate processed paths txt file
+                var outProcessedTxtFile = Path.Combine(GeneratedPathsDir, "ProcessedPaths.txt");
+
+                if (File.Exists(outProcessedTxtFile))
+                {
+                    File.Delete(outProcessedTxtFile);
+                }
+
+                using (var processedPathsWriter = new StreamWriter(outProcessedTxtFile, true))
+                {
+                    processedPathsWriter.WriteLine("");
+                    processedPathsWriter.WriteLine("processed: " + processedPathsList.Count);
+                    processedPathsWriter.WriteLine();
+
+                    foreach (var procItem in processedPathsList)
+                    {
+                        processedPathsWriter.Write("fileName: " + procItem.Item1 + " | ");
+                        processedPathsWriter.WriteLine("fileCode: " + procItem.Item2);
+                    }
                 }
             }
         }

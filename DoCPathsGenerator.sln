@@ -7,10 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoCPathsGenerator", "DoCPat
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug (check)|Any CPU = Debug (check)|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (check)|Any CPU.ActiveCfg = Debug (check)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (check)|Any CPU.Build.0 = Debug (check)|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace DoCPathsGenerator
 {
@@ -7,6 +8,10 @@ namespace DoCPathsGenerator
     {
         public static void CheckAvailablePaths(string unpackedKELdir, string generatedPathsDir)
         {
+            Console.WriteLine("Checking....");
+            Console.WriteLine("");
+            Thread.Sleep(200);
+
             var filesTxtFile = Path.Combine(unpackedKELdir, "file.txt");
             if (!File.Exists(filesTxtFile))
             {
