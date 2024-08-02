@@ -28,7 +28,7 @@ namespace DoCPathsGenerator
         }
 
 
-        public static void ProcessGeneratedPath(string virtualPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk, uint fileCode)
+        public static void ProcessGeneratedPath(bool moveFiles, string virtualPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk, uint fileCode)
         {
             var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDir, Path.GetDirectoryName(virtualPath));
             if (!Directory.Exists(dirInGenPathsDir))
@@ -36,7 +36,14 @@ namespace DoCPathsGenerator
                 Directory.CreateDirectory(dirInGenPathsDir);
             }
 
-            File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
+            if (moveFiles)
+            {
+                File.Move(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
+            }
+            else
+            {
+                File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
+            }
 
             if (generatedPathsDict.ContainsKey(currentChunk))
             {

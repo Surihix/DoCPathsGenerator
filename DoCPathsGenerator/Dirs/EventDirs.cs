@@ -146,7 +146,7 @@ namespace DoCPathsGenerator.Dirs
         private static void GenerateEventPath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
         {
             LastKey = currentChunk;
-            GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            GeneratorHelpers.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
             PathsGenerated++;
         }
     }

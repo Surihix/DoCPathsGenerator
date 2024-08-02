@@ -9,5 +9,7 @@
         public static readonly string ZoneDir = "data\\zone";
 
         public static readonly string ZoneLocaleDir = "data\\zone\\locale";
+
+        public static readonly string ZoneEffectDir = "data\\effect\\field";
     }
 }

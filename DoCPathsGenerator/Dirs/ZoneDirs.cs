@@ -86,12 +86,13 @@ namespace DoCPathsGenerator.Dirs
                     var isZoneAnmKfd = _subTypeVal == 1 && _index == 0;
                     var isZonemapidRfd = _subTypeVal == 1 && _index == 1;
                     var isZoneModelRfd = _subTypeVal == 1 && _index == 2;
+                    var isZoneEffectFed = _subTypeVal == 1 && _index == 4;
 
                     var isZoneLocaleStrBin = _dependantVal == 0 && _subTypeVal == 2 && _index >= 0 && _index <= 6;
 
                     string generatedDirName = string.Empty;
 
-                    if (_subTypeVal == 1)
+                    if (_subTypeVal == 1 && _index != 4)
                     {
                         generatedDirName = GeneratorHelpers.GenerateFolderNameWithNumber("m", _dependantVal, 3);
                     }
@@ -184,6 +185,16 @@ namespace DoCPathsGenerator.Dirs
                         isDone = true;
                     }
 
+                    if (isZoneEffectFed && !isDone)
+                    {
+                        zFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("z", _zFolderNum, 4);
+                        generatedDirName = GeneratorHelpers.GenerateFolderNameWithNumber("f", _dependantVal, 4);
+                        generatedVPath = Path.Combine(ZoneEffectDir, zFolderNumPadded, generatedDirName, "fer", generatedDirName + ".fed");
+
+                        GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
+                        isDone = true;
+                    }
+
                     if (isZoneLocaleStrBin && !isDone)
                     {
                         var generatedFName = GeneratorHelpers.ComputeFNameLanguage(_index, "gmap_str");
@@ -201,7 +212,7 @@ namespace DoCPathsGenerator.Dirs
         private static void GenerateZonePath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
         {
             LastKey = currentChunk;
-            GeneratorHelpers.ProcessGeneratedPath(generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            GeneratorHelpers.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
             PathsGenerated++;
         }
     }

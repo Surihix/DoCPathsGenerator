@@ -53,6 +53,7 @@ namespace DoCPathsGenerator
                     break;
 
                 case ActionSwitches.g:
+                case ActionSwitches.gm:
                     var jsonFile = args[1];
                     unpackedKELdir = args[2];
 
@@ -66,7 +67,8 @@ namespace DoCPathsGenerator
                         GeneratorHelpers.ErrorExit("Specified '_KEL.DAT' folder is missing");
                     }
 
-                    PathsGenerator.GeneratePaths(jsonFile, unpackedKELdir);
+                    var shouldMove = actionSwitch == ActionSwitches.gm;
+                    PathsGenerator.GeneratePaths(shouldMove, jsonFile, unpackedKELdir);
 
                     Console.WriteLine("");
                     Console.WriteLine("");
@@ -80,7 +82,8 @@ namespace DoCPathsGenerator
         enum ActionSwitches
         {
             c,
-            g
+            g,
+            gm
         }
     }
 }

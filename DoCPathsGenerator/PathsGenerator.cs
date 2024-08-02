@@ -8,13 +8,15 @@ namespace DoCPathsGenerator
 {
     internal class PathsGenerator
     {
+        public static bool MoveFiles { get; set; }
         public static string GeneratedPathsDir { get; set; }
         public static string LastKey { get; set; }
 
         public static uint PathsGenerated = 0;
 
-        public static void GeneratePaths(string jsonFile, string unpackedKELdir)
+        public static void GeneratePaths(bool shouldMove, string jsonFile, string unpackedKELdir)
         {
+            MoveFiles = shouldMove;
             GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
             using (var jsonReader = new StreamReader(jsonFile))
@@ -70,7 +72,7 @@ namespace DoCPathsGenerator
                 string fileCodeBinaryVal;
                 uint mainTypeVal;
 
-                var processedPathsList = new List<(string, uint)>();
+                var noPathsList = new List<(string, uint)>();
                 var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
 
                 var fileCounter = uint.MinValue;
@@ -156,7 +158,7 @@ namespace DoCPathsGenerator
 
                             if (File.Exists(noPathFile))
                             {
-                                processedPathsList.Add(($"FILE_{noPathCounter}", fileCode));
+                                noPathsList.Add(($"FILE_{noPathCounter}", fileCode));
 
                                 fileCodeBinaryVal = fileCode.UIntToBinary();
                                 mainTypeVal = fileCodeBinaryVal.BinaryToUInt(0, 8);
@@ -253,21 +255,22 @@ namespace DoCPathsGenerator
                     mappingsJsonWriter.WriteLine("}");
                 }
 
-                // Generate processed paths txt file
-                var outProcessedTxtFile = Path.Combine(GeneratedPathsDir, "ProcessedPaths.txt");
+                // Generate total list of noPath files
+                // on to the txt file
+                var outNoPathsListTxtFile = Path.Combine(GeneratedPathsDir, "NoPathsList.txt");
 
-                if (File.Exists(outProcessedTxtFile))
+                if (File.Exists(outNoPathsListTxtFile))
                 {
-                    File.Delete(outProcessedTxtFile);
+                    File.Delete(outNoPathsListTxtFile);
                 }
 
-                using (var processedPathsWriter = new StreamWriter(outProcessedTxtFile, true))
+                using (var processedPathsWriter = new StreamWriter(outNoPathsListTxtFile, true))
                 {
                     processedPathsWriter.WriteLine("");
-                    processedPathsWriter.WriteLine("processed: " + processedPathsList.Count);
+                    processedPathsWriter.WriteLine("Total NoPaths: " + noPathsList.Count);
                     processedPathsWriter.WriteLine();
 
-                    foreach (var procItem in processedPathsList)
+                    foreach (var procItem in noPathsList)
                     {
                         processedPathsWriter.Write("fileName: " + procItem.Item1 + " | ");
                         processedPathsWriter.WriteLine("fileCode: " + procItem.Item2);
