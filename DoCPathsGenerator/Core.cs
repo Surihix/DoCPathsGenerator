@@ -14,6 +14,7 @@ namespace DoCPathsGenerator
                 Console.WriteLine("Enough arguments not specified\n");
                 Console.WriteLine("Examples:");
                 Console.WriteLine("DoCPathsGenerator.exe -g [FILELIST.BIN.json filePath] [unpacked _KEL.DAT folderPath]");
+                Console.WriteLine("DoCPathsGenerator.exe -gm [FILELIST.BIN.json filePath] [unpacked _KEL.DAT folderPath]");
                 Console.WriteLine("DoCPathsGenerator.exe -c [unpacked _KEL.DAT folderPath] [#generatedPaths folder path]");
                 Console.ReadLine();
                 Environment.Exit(0);
