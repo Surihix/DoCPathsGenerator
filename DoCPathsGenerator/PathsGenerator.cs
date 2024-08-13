@@ -1,4 +1,5 @@
 ﻿using DoCPathsGenerator.Dirs;
+using DoCPathsGenerator.Filelist;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,44 @@ namespace DoCPathsGenerator
         public static string LastKey { get; set; }
 
         public static uint PathsGenerated = 0;
+
+        public static void GeneratePaths2(bool shouldMove, string filelistFile, string unpackedKELdir)
+        {
+            MoveFiles = shouldMove;
+            GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
+
+            var filelistVariables = new FilelistVariables();
+
+            using (var filelistStream = new FileStream(filelistFile, FileMode.Open, FileAccess.Read))
+            {
+                using (var filelistReader = new BinaryReader(filelistStream))
+                {
+                    FilelistChunksPrep.GetFilelistOffsets(filelistReader, filelistVariables);
+                    FilelistChunksPrep.BuildChunks(filelistStream, filelistVariables);
+                }
+            }
+
+            using (var entriesStream = new MemoryStream())
+            {
+                entriesStream.Write(filelistVariables.EntriesData, 0, filelistVariables.EntriesData.Length);
+                entriesStream.Seek(0, SeekOrigin.Begin);
+
+                using (var entriesReader = new BinaryReader(entriesStream))
+                {
+
+                    // Extracting files section 
+                    long entriesReadPos = 0;
+
+                    for (int f = 0; f < filelistVariables.TotalFiles; f++)
+                    {
+                        FilelistProcesses.GetCurrentFileEntry(entriesReader, entriesReadPos, filelistVariables);
+                        entriesReadPos += 8;
+
+                    }
+                }
+            }
+        }
+
 
         public static void GeneratePaths(bool shouldMove, string jsonFile, string unpackedKELdir)
         {
