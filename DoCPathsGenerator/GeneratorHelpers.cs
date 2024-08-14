@@ -23,13 +23,19 @@ namespace DoCPathsGenerator
                 Directory.CreateDirectory(dirInGenPathsDir);
             }
 
+            var outFilePath = Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath);
+            if (File.Exists(outFilePath))
+            {
+                File.Delete(outFilePath);
+            }
+
             if (moveFiles)
             {
-                File.Move(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
+                File.Move(noPathFile, outFilePath);
             }
             else
             {
-                File.Copy(noPathFile, Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath));
+                File.Copy(noPathFile, outFilePath);
             }
 
             if (generatedPathsDict.ContainsKey(currentChunk))

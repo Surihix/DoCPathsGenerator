@@ -5,7 +5,7 @@ using static DoCPathsGenerator.PathStructures;
 
 namespace DoCPathsGenerator.Dirs
 {
-    internal class EventDirs
+    internal class EventCategory
     {
         public static uint FileCode { get; set; }
         public static string FileCodeBinary { get; set; }

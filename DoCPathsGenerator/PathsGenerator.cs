@@ -87,18 +87,24 @@ namespace DoCPathsGenerator
 
                                 switch (mainTypeVal)
                                 {
+                                    // data/zone
+                                    // data/effect/field
+                                    // data/bmd
                                     case 6:
-                                        ZoneDirs.FileCode = filelistVariables.FileCode;
-                                        ZoneDirs.FileCodeBinary = fileCodeBinaryVal;
+                                    case 10:
+                                        ZoneCategory.FileCode = filelistVariables.FileCode;
+                                        ZoneCategory.FileCodeBinary = fileCodeBinaryVal;
+                                        ZoneCategory.ZoneDirType = mainTypeVal;
 
-                                        ZoneDirs.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
+                                        ZoneCategory.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
                                         break;
 
+                                    // data/event
                                     case 12:
-                                        EventDirs.FileCode = filelistVariables.FileCode;
-                                        EventDirs.FileCodeBinary = fileCodeBinaryVal;
+                                        EventCategory.FileCode = filelistVariables.FileCode;
+                                        EventCategory.FileCodeBinary = fileCodeBinaryVal;
 
-                                        EventDirs.ProcessEventPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
+                                        EventCategory.ProcessEventPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
                                         break;
                                 }
                             }

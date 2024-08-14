@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DoCPathsGenerator\Categories\ChrCategory.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\ZlibMethods.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistChunksPrep.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistProcesses.cs" />
@@ -71,9 +72,9 @@
     <Compile Include="DoCPathsGenerator\Ionic\Zlib\ZlibConstants.cs" />
     <Compile Include="DoCPathsGenerator\Ionic\Zlib\ZlibStream.cs" />
     <Compile Include="DoCPathsGenerator\PathsChecker.cs" />
-    <Compile Include="DoCPathsGenerator\Dirs\EventDirs.cs" />
+    <Compile Include="DoCPathsGenerator\Categories\EventCategory.cs" />
     <Compile Include="DoCPathsGenerator\Extensions\BitOperationHelpers.cs" />
-    <Compile Include="DoCPathsGenerator\Dirs\ZoneDirs.cs" />
+    <Compile Include="DoCPathsGenerator\Categories\ZoneCategory.cs" />
     <Compile Include="DoCPathsGenerator\PathsGenerator.cs" />
     <Compile Include="DoCPathsGenerator\PathStructures.cs" />
     <Compile Include="DoCPathsGenerator\GeneratorHelpers.cs" />

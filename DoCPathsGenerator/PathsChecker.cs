@@ -18,7 +18,7 @@ namespace DoCPathsGenerator
                 GeneratorHelpers.ErrorExit("Missing 'file.txt' file in the unpacked KEL directory");
             }
 
-            var missingFilesTxt = Path.Combine(generatedPathsDir, "missing_list.txt");
+            var missingFilesTxt = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "missing_list.txt");
             var missingCounter = 0;
 
             if (File.Exists(missingFilesTxt))
