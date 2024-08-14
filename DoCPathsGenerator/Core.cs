@@ -13,9 +13,9 @@ namespace DoCPathsGenerator
             {
                 Console.WriteLine("Enough arguments not specified\n");
                 Console.WriteLine("Examples:");
-                Console.WriteLine("DoCPathsGenerator.exe -g [FILELIST.BIN.json filePath] [unpacked _KEL.DAT folderPath]");
-                Console.WriteLine("DoCPathsGenerator.exe -gm [FILELIST.BIN.json filePath] [unpacked _KEL.DAT folderPath]");
-                Console.WriteLine("DoCPathsGenerator.exe -c [unpacked _KEL.DAT folderPath] [#generatedPaths folder path]");
+                Console.WriteLine("DoCPathsGenerator.exe -g [FILELIST.BIN filePath] [unpacked _KEL.DAT folderPath]");
+                Console.WriteLine("DoCPathsGenerator.exe -gm [FILELIST.BIN filePath] [unpacked _KEL.DAT folderPath]");
+                //Console.WriteLine("DoCPathsGenerator.exe -c [unpacked _KEL.DAT folderPath] [#generatedPaths folder path]");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
@@ -55,12 +55,12 @@ namespace DoCPathsGenerator
 
                 case ActionSwitches.g:
                 case ActionSwitches.gm:
-                    var jsonFile = args[1];
+                    var filelistFile = args[1];
                     unpackedKELdir = args[2];
 
-                    if (!File.Exists(jsonFile))
+                    if (!File.Exists(filelistFile))
                     {
-                        GeneratorHelpers.ErrorExit("Specified 'FILELIST.BIN.json' file is missing");
+                        GeneratorHelpers.ErrorExit("Specified 'FILELIST.BIN' file is missing");
                     }
 
                     if (!Directory.Exists(unpackedKELdir))
@@ -69,7 +69,7 @@ namespace DoCPathsGenerator
                     }
 
                     var shouldMove = actionSwitch == ActionSwitches.gm;
-                    PathsGenerator.GeneratePaths(shouldMove, jsonFile, unpackedKELdir);
+                    PathsGenerator.GeneratePaths(shouldMove, filelistFile, unpackedKELdir);
 
                     Console.WriteLine("");
                     Console.WriteLine("");

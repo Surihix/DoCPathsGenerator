@@ -15,8 +15,13 @@ namespace DoCPathsGenerator
 
         public static uint PathsGenerated = 0;
 
-        public static void GeneratePaths2(bool shouldMove, string filelistFile, string unpackedKELdir)
+        public static void GeneratePaths(bool shouldMove, string filelistFile, string unpackedKELdir)
         {
+            Console.WriteLine("");
+            Console.WriteLine("Reading filelist data....");
+            Console.WriteLine("");
+            Thread.Sleep(900);
+
             MoveFiles = shouldMove;
             GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
 
@@ -31,6 +36,21 @@ namespace DoCPathsGenerator
                 }
             }
 
+            Console.WriteLine($"TotalChunks: {filelistVariables.TotalChunks}");
+            Console.WriteLine($"No of files: {filelistVariables.TotalFiles}");
+            Console.WriteLine("");
+            Console.WriteLine("Preparing to generate....");
+            Console.WriteLine("");
+            Thread.Sleep(900);
+
+            if (Directory.Exists(GeneratedPathsDir))
+            {
+                Directory.Delete(GeneratedPathsDir, true);
+            }
+
+            var noPathsList = new List<(string, uint)>();
+            var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
+
             using (var entriesStream = new MemoryStream())
             {
                 entriesStream.Write(filelistVariables.EntriesData, 0, filelistVariables.EntriesData.Length);
@@ -38,282 +58,132 @@ namespace DoCPathsGenerator
 
                 using (var entriesReader = new BinaryReader(entriesStream))
                 {
-
-                    // Extracting files section 
                     long entriesReadPos = 0;
+                    string fileCodeBinaryVal;
+                    uint mainTypeVal;
 
                     for (int f = 0; f < filelistVariables.TotalFiles; f++)
                     {
                         FilelistProcesses.GetCurrentFileEntry(entriesReader, entriesReadPos, filelistVariables);
                         entriesReadPos += 8;
 
-                    }
-                }
-            }
-        }
+                        filelistVariables.ConvertedStringData = filelistVariables.PathString.Split(':');
+                        filelistVariables.MainPath = filelistVariables.ConvertedStringData[3].Replace("/", Convert.ToString(Path.DirectorySeparatorChar));
 
-
-        public static void GeneratePaths(bool shouldMove, string jsonFile, string unpackedKELdir)
-        {
-            MoveFiles = shouldMove;
-            GeneratedPathsDir = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "#generatedPaths");
-
-            using (var jsonReader = new StreamReader(jsonFile))
-            {
-                object tmpValueRead = string.Empty;
-
-                _ = jsonReader.ReadLine();
-                _ = jsonReader.ReadLine();
-
-                // Get fileCount and chunkCount values
-                tmpValueRead = GeneratorHelpers.CheckParseJsonProperty(jsonReader, "\"fileCount\":", "fileCount property string in the json file is invalid");
-                if (!uint.TryParse(tmpValueRead.ToString().Split(':')[1].TrimEnd(','), out uint fileCount))
-                {
-                    GeneratorHelpers.ErrorExit("Unable to parse 'fileCount' property's value");
-                }
-
-                tmpValueRead = GeneratorHelpers.CheckParseJsonProperty(jsonReader, "\"chunkCount\":", "chunkCount property string in the json file is invalid");
-                if (!int.TryParse(tmpValueRead.ToString().Split(':')[1].TrimEnd(','), out int chunkCount))
-                {
-                    GeneratorHelpers.ErrorExit("Unable to parse 'chunkCount' property's value");
-                }
-
-                Console.WriteLine($"TotalChunks: {chunkCount}");
-                Console.WriteLine($"No of files: {fileCount}");
-                Console.WriteLine("");
-                Console.WriteLine("Generating....");
-                Console.WriteLine("");
-                Thread.Sleep(200);
-
-                tmpValueRead = GeneratorHelpers.CheckParseJsonProperty(jsonReader, "\"data\": {", "data property string in the json file is invalid");
-
-                if (Directory.Exists(GeneratedPathsDir))
-                {
-                    Directory.Delete(GeneratedPathsDir, true);
-                }
-
-
-                // Parse each filepath
-                var runMainLoop = true;
-                bool endLoopNext;
-
-                string currentChunk;
-                var chunkStringStartChara = "\"Chunk_";
-                var chunkCounter = 0;
-
-                string[] currentData;
-                var splitChara = new string[] { ", " };
-                var splitChara2 = new string[] { "\": " };
-                string fileCodeData;
-
-                string noPathFile;
-                uint noPathCounter = 1;
-                string fileCodeBinaryVal;
-                uint mainTypeVal;
-
-                var noPathsList = new List<(string, uint)>();
-                var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
-
-                var fileCounter = uint.MinValue;
-
-                while (runMainLoop)
-                {
-                    currentChunk = chunkStringStartChara + chunkCounter + "\"";
-                    _ = GeneratorHelpers.CheckParseJsonProperty(jsonReader, currentChunk, $"{currentChunk} property string in the json file is invalid");
-
-                    endLoopNext = false;
-
-                    while (true)
-                    {
-                        if (endLoopNext)
+                        if (filelistVariables.MainPath == " ")
                         {
-                            chunkCounter++;
-                            _ = jsonReader.ReadLine();
-                            _ = jsonReader.ReadLine();
-                            break;
-                        }
+                            filelistVariables.NoPathFileCount++;
+                            filelistVariables.DirectoryPath = "noPath";
+                            filelistVariables.FileName = "FILE_" + filelistVariables.NoPathFileCount;
+                            filelistVariables.FullFilePath = Path.Combine(unpackedKELdir, filelistVariables.DirectoryPath, filelistVariables.FileName);
+                            filelistVariables.MainPath = Path.Combine(filelistVariables.DirectoryPath, filelistVariables.FileName);
 
-                        tmpValueRead = jsonReader.ReadLine().TrimStart(' ').TrimEnd(' ');
-
-                        // Assume that the chunk
-                        // is going to end if the
-                        // string is ending with '}' chara
-                        if (tmpValueRead.ToString().EndsWith("}"))
-                        {
-                            endLoopNext = true;
-                        }
-
-                        // Assume that we have the
-                        // data at this stage
-                        currentData = tmpValueRead.ToString().Split(splitChara, StringSplitOptions.None);
-                        if (currentData.Length < 2)
-                        {
-                            GeneratorHelpers.ErrorExit($"Unable to parse data. occured when parsing {currentChunk}.");
-                        }
-
-                        // filecode
-                        fileCodeData = currentData[0].ToString();
-
-                        if (!fileCodeData.StartsWith("{ \"fileCode\":"))
-                        {
-                            GeneratorHelpers.ErrorExit($"fileCode property string in the json file was invalid. occured when parsing {currentChunk}.");
-                        }
-
-                        if (!uint.TryParse(fileCodeData.Split(splitChara2, StringSplitOptions.None)[1], out uint fileCode))
-                        {
-                            GeneratorHelpers.ErrorExit($"unable to parse fileCode property's value. occured when parsing {currentChunk}.");
-                        }
-
-                        // path
-                        var pathRead = currentData[1];
-                        if (!pathRead.StartsWith("\"filePath\":"))
-                        {
-                            GeneratorHelpers.ErrorExit($"filePath property string in the json file was invalid. occured when parsing {currentChunk}.");
-                        }
-
-                        pathRead = pathRead.Split(splitChara2, StringSplitOptions.None)[1];
-                        pathRead = pathRead.Remove(0, 1);
-
-                        var pathString = string.Empty;
-                        for (int s = 0; s < pathRead.Length; s++)
-                        {
-                            if (pathRead[s] == '"')
+                            if (File.Exists(filelistVariables.FullFilePath))
                             {
-                                break;
-                            }
-                            else
-                            {
-                                pathString += pathRead[s];
-                            }
-                        }
+                                noPathsList.Add(($"FILE_{filelistVariables.NoPathFileCount}", filelistVariables.FileCode));
 
-                        pathRead = pathString.Split(':')[3];
-
-                        // Assume that there
-                        // is no path
-                        if (pathRead == " ")
-                        {
-                            noPathFile = Path.Combine(unpackedKELdir, "noPath", $"FILE_{noPathCounter}");
-
-                            if (File.Exists(noPathFile))
-                            {
-                                noPathsList.Add(($"FILE_{noPathCounter}", fileCode));
-
-                                fileCodeBinaryVal = fileCode.UIntToBinary();
+                                fileCodeBinaryVal = filelistVariables.FileCode.UIntToBinary();
                                 mainTypeVal = fileCodeBinaryVal.BinaryToUInt(0, 8);
 
                                 switch (mainTypeVal)
                                 {
                                     case 6:
-                                        ZoneDirs.FileCode = fileCode;
+                                        ZoneDirs.FileCode = filelistVariables.FileCode;
                                         ZoneDirs.FileCodeBinary = fileCodeBinaryVal;
 
-                                        ZoneDirs.ProcessZonePath(noPathFile, generatedPathsDict, currentChunk);
+                                        ZoneDirs.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
                                         break;
 
                                     case 12:
-                                        EventDirs.FileCode = fileCode;
+                                        EventDirs.FileCode = filelistVariables.FileCode;
                                         EventDirs.FileCodeBinary = fileCodeBinaryVal;
 
-                                        EventDirs.ProcessEventPath(noPathFile, generatedPathsDict, currentChunk);
+                                        EventDirs.ProcessEventPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
                                         break;
                                 }
                             }
-
-                            noPathCounter++;
-                        }
-
-                        fileCounter++;
-
-                        // End the loop if the 
-                        // filecounter value is
-                        // same as the last file
-                        if (fileCounter == fileCount)
-                        {
-                            runMainLoop = false;
-                            break;
                         }
                     }
                 }
+            }
 
-                Console.WriteLine("");
-                Console.WriteLine($"Total paths generated: {PathsGenerated}");
+            Console.WriteLine("");
+            Console.WriteLine($"Total paths generated: {PathsGenerated}");
 
 
-                Console.WriteLine("");
-                Console.WriteLine("Generating JSON and txt files....");
+            Console.WriteLine("");
+            Console.WriteLine("Generating JSON and txt files....");
 
-                // Generate mappings json file
-                var outMappingsJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
+            // Generate mappings json file
+            var outMappingsJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
 
-                if (File.Exists(outMappingsJsonFile))
+            if (File.Exists(outMappingsJsonFile))
+            {
+                File.Delete(outMappingsJsonFile);
+            }
+
+            using (var mappingsJsonWriter = new StreamWriter(outMappingsJsonFile, true))
+            {
+                mappingsJsonWriter.WriteLine("{");
+                mappingsJsonWriter.WriteLine("  \"pathCount\": " + PathsGenerated + ",");
+                mappingsJsonWriter.WriteLine("  \"pathData\": {");
+
+                foreach (var key in generatedPathsDict.Keys)
                 {
-                    File.Delete(outMappingsJsonFile);
-                }
+                    mappingsJsonWriter.WriteLine($"             {key}: [");
+                    var lastValueSet = generatedPathsDict[key][generatedPathsDict[key].Count - 1];
 
-                using (var mappingsJsonWriter = new StreamWriter(outMappingsJsonFile, true))
-                {
-                    mappingsJsonWriter.WriteLine("{");
-                    mappingsJsonWriter.WriteLine("  \"pathCount\": " + PathsGenerated + ",");
-                    mappingsJsonWriter.WriteLine("  \"pathData\": {");
-
-                    foreach (var key in generatedPathsDict.Keys)
+                    foreach (var values in generatedPathsDict[key])
                     {
-                        mappingsJsonWriter.WriteLine($"             {key}: [");
-                        var lastValueSet = generatedPathsDict[key][generatedPathsDict[key].Count - 1];
+                        mappingsJsonWriter.Write("               { ");
+                        mappingsJsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
+                        mappingsJsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
+                        mappingsJsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
 
-                        foreach (var values in generatedPathsDict[key])
+                        if (values == lastValueSet)
                         {
-                            mappingsJsonWriter.Write("               { ");
-                            mappingsJsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
-                            mappingsJsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
-                            mappingsJsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
+                            mappingsJsonWriter.WriteLine("}");
 
-                            if (values == lastValueSet)
+                            if (key == LastKey)
                             {
-                                mappingsJsonWriter.WriteLine("}");
-
-                                if (key == LastKey)
-                                {
-                                    mappingsJsonWriter.WriteLine("             ]");
-                                }
-                                else
-                                {
-                                    mappingsJsonWriter.WriteLine("             ],");
-                                    mappingsJsonWriter.WriteLine("");
-                                }
+                                mappingsJsonWriter.WriteLine("             ]");
                             }
                             else
                             {
-                                mappingsJsonWriter.WriteLine("},");
+                                mappingsJsonWriter.WriteLine("             ],");
+                                mappingsJsonWriter.WriteLine("");
                             }
                         }
+                        else
+                        {
+                            mappingsJsonWriter.WriteLine("},");
+                        }
                     }
-
-                    mappingsJsonWriter.WriteLine("  }");
-                    mappingsJsonWriter.WriteLine("}");
                 }
 
-                // Generate total list of noPath files
-                // on to the txt file
-                var outNoPathsListTxtFile = Path.Combine(GeneratedPathsDir, "NoPathsList.txt");
+                mappingsJsonWriter.WriteLine("  }");
+                mappingsJsonWriter.WriteLine("}");
+            }
 
-                if (File.Exists(outNoPathsListTxtFile))
+            // Generate total list of noPath files
+            // on to the txt file
+            var outNoPathsListTxtFile = Path.Combine(GeneratedPathsDir, "NoPathsList.txt");
+
+            if (File.Exists(outNoPathsListTxtFile))
+            {
+                File.Delete(outNoPathsListTxtFile);
+            }
+
+            using (var processedPathsWriter = new StreamWriter(outNoPathsListTxtFile, true))
+            {
+                processedPathsWriter.WriteLine("");
+                processedPathsWriter.WriteLine("Total NoPaths: " + noPathsList.Count);
+                processedPathsWriter.WriteLine();
+
+                foreach (var procItem in noPathsList)
                 {
-                    File.Delete(outNoPathsListTxtFile);
-                }
-
-                using (var processedPathsWriter = new StreamWriter(outNoPathsListTxtFile, true))
-                {
-                    processedPathsWriter.WriteLine("");
-                    processedPathsWriter.WriteLine("Total NoPaths: " + noPathsList.Count);
-                    processedPathsWriter.WriteLine();
-
-                    foreach (var procItem in noPathsList)
-                    {
-                        processedPathsWriter.Write("fileName: " + procItem.Item1 + " | ");
-                        processedPathsWriter.WriteLine("fileCode: " + procItem.Item2);
-                    }
+                    processedPathsWriter.Write("fileName: " + procItem.Item1 + " | ");
+                    processedPathsWriter.WriteLine("fileCode: " + procItem.Item2);
                 }
             }
         }

@@ -15,19 +15,6 @@ namespace DoCPathsGenerator
         }
 
 
-        public static string CheckParseJsonProperty(StreamReader jsonReader, string propertyValue, string errorMsg)
-        {
-            var valueRead = jsonReader.ReadLine().TrimStart(' ');
-
-            if (!valueRead.StartsWith(propertyValue))
-            {
-                ErrorExit(errorMsg);
-            }
-
-            return valueRead;
-        }
-
-
         public static void ProcessGeneratedPath(bool moveFiles, string virtualPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk, uint fileCode)
         {
             var dirInGenPathsDir = Path.Combine(PathsGenerator.GeneratedPathsDir, Path.GetDirectoryName(virtualPath));

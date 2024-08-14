@@ -1,5 +1,4 @@
-﻿using DoCPathsGenerator.Support;
-using System.IO;
+﻿using System.IO;
 
 namespace DoCPathsGenerator.Filelist
 {

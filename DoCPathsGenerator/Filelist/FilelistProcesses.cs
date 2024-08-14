@@ -11,7 +11,6 @@ namespace DoCPathsGenerator.Filelist
             filelistVariables.FileCode = entriesReader.ReadUInt32();
             filelistVariables.ChunkNumber = entriesReader.ReadUInt16();
             filelistVariables.PathStringPos = entriesReader.ReadUInt16();
-            filelistVariables.LastChunkNumber = filelistVariables.ChunkNumber;
 
             GeneratePathString(filelistVariables.PathStringPos, filelistVariables.ChunkDataDict[filelistVariables.ChunkNumber], filelistVariables);
         }
