@@ -8,12 +8,24 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug (check)|Any CPU = Debug (check)|Any CPU
+		Debug (EUR)|Any CPU = Debug (EUR)|Any CPU
+		Debug (EUR_Check)|Any CPU = Debug (EUR_Check)|Any CPU
+		Debug (JPN)|Any CPU = Debug (JPN)|Any CPU
+		Debug (JPN_Check)|Any CPU = Debug (JPN_Check)|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (check)|Any CPU.ActiveCfg = Debug (check)|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (check)|Any CPU.Build.0 = Debug (check)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (EUR)|Any CPU.ActiveCfg = Debug (EUR)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (EUR)|Any CPU.Build.0 = Debug (EUR)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (EUR_Check)|Any CPU.ActiveCfg = Debug (EUR_Check)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (EUR_Check)|Any CPU.Build.0 = Debug (EUR_Check)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (JPN)|Any CPU.ActiveCfg = Debug (JPN)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (JPN)|Any CPU.Build.0 = Debug (JPN)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (JPN_Check)|Any CPU.ActiveCfg = Debug (JPN_Check)|Any CPU
+		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug (JPN_Check)|Any CPU.Build.0 = Debug (JPN_Check)|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A187A06-D060-4D0E-AEFD-8552EDAE95B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
