@@ -53,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DoCPathsGenerator\Categories\ChrCategory.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\ZlibMethods.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistChunksPrep.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistProcesses.cs" />
