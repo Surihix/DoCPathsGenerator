@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DoCPathsGenerator
+namespace DoCPathsGenerator.Support
 {
-    internal class GeneratorHelpers
+    internal class SharedMethods
     {
         public static void ErrorExit(string errorMsg)
         {
@@ -12,6 +12,25 @@ namespace DoCPathsGenerator
             Console.WriteLine($"Error: {errorMsg}");
             Console.ReadLine();
             Environment.Exit(1);
+        }
+
+
+        public static void IfFileFolderExistsDel(string fileOrFolderName, bool isFile)
+        {
+            if (isFile)
+            {
+                if (File.Exists(fileOrFolderName))
+                {
+                    File.Delete(fileOrFolderName);
+                }
+            }
+            else
+            {
+                if (Directory.Exists(fileOrFolderName))
+                {
+                    Directory.Delete(fileOrFolderName, true);
+                }
+            }
         }
 
 
@@ -24,10 +43,7 @@ namespace DoCPathsGenerator
             }
 
             var outFilePath = Path.Combine(PathsGenerator.GeneratedPathsDir, virtualPath);
-            if (File.Exists(outFilePath))
-            {
-                File.Delete(outFilePath);
-            }
+            IfFileFolderExistsDel(outFilePath, true);
 
             if (moveFiles)
             {

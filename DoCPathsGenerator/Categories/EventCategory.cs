@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using DoCPathsGenerator.Support;
+using System.Collections.Generic;
 using System.IO;
 using static DoCPathsGenerator.PathsGenerator;
-using static DoCPathsGenerator.PathStructures;
+using static DoCPathsGenerator.Support.PathStructures;
 
 namespace DoCPathsGenerator.Dirs
 {
@@ -20,7 +21,7 @@ namespace DoCPathsGenerator.Dirs
             _evFolderNum = FileCodeBinary.BinaryToUInt(8, 12);
             _subTypeVal = FileCodeBinary.BinaryToUInt(20, 4);
 
-            var evFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("ev", _evFolderNum, 4);
+            var evFolderNumPadded = SharedMethods.GenerateFolderNameWithNumber("ev", _evFolderNum, 4);
 
             switch (_subTypeVal)
             {
@@ -40,7 +41,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isEventSceneStrBinType0)
                     {
-                        generatedFName = GeneratorHelpers.ComputeFNameNum(_index, "string", "bin");
+                        generatedFName = SharedMethods.ComputeFNameNum(_index, "string", "bin");
                         generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -55,7 +56,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isEventSceneClassType0)
                     {
-                        generatedFName = GeneratorHelpers.ComputeFNameNum(_index, "scr0", "class");
+                        generatedFName = SharedMethods.ComputeFNameNum(_index, "scr0", "class");
                         generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -70,7 +71,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isEventLocaleTxtBin)
                     {
-                        generatedFName = GeneratorHelpers.ComputeFNameLanguage(_index, "string");
+                        generatedFName = SharedMethods.ComputeFNameLanguage(_index, "string");
                         generatedVPath = Path.Combine(EventLocaleDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -86,7 +87,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isPtdBin)
                     {
-                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("ptd", _index, 3, ".bin");
+                        generatedFName = SharedMethods.GenerateFNameWithNumber("ptd", _index, 3, ".bin");
                         generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -94,7 +95,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isEvmRfd)
                     {
-                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("evm", _index, 3, ".rfd");
+                        generatedFName = SharedMethods.GenerateFNameWithNumber("evm", _index, 3, ".rfd");
                         generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -110,7 +111,7 @@ namespace DoCPathsGenerator.Dirs
 
                     if (isTexRfd)
                     {
-                        generatedFName = GeneratorHelpers.GenerateFNameWithNumber("tex", _index, 3, ".rfd");
+                        generatedFName = SharedMethods.GenerateFNameWithNumber("tex", _index, 3, ".rfd");
                         generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
 
                         GenerateEventPath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -124,7 +125,7 @@ namespace DoCPathsGenerator.Dirs
                         }
                         else
                         {
-                            generatedFName = GeneratorHelpers.GenerateFNameWithNumber("sep", _index, 3, ".bin");
+                            generatedFName = SharedMethods.GenerateFNameWithNumber("sep", _index, 3, ".bin");
                             generatedVPath = Path.Combine(EventSceneDir, evFolderNumPadded, generatedFName);
                         }
 
@@ -146,7 +147,7 @@ namespace DoCPathsGenerator.Dirs
         private static void GenerateEventPath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
         {
             LastKey = currentChunk;
-            GeneratorHelpers.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            SharedMethods.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
             PathsGenerated++;
         }
     }

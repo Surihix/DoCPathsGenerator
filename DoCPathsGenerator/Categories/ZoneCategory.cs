@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DoCPathsGenerator.Support;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using static DoCPathsGenerator.PathsGenerator;
-using static DoCPathsGenerator.PathStructures;
+using static DoCPathsGenerator.Support.PathStructures;
 
 namespace DoCPathsGenerator.Dirs
 {
@@ -21,7 +22,7 @@ namespace DoCPathsGenerator.Dirs
         public static void ProcessZonePath(string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk)
         {
             _zFolderNum = FileCodeBinary.BinaryToUInt(8, 8);
-            var zFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("z", _zFolderNum, 3);
+            var zFolderNumPadded = SharedMethods.GenerateFolderNameWithNumber("z", _zFolderNum, 3);
             string generatedVPath;
 
             if (ZoneDirType == 10)
@@ -46,7 +47,7 @@ namespace DoCPathsGenerator.Dirs
                     // is a map/mm##.bin
                     case 253:
                         _index = FileCodeBinary.BinaryToUInt(24, 8);
-                        var mmName = GeneratorHelpers.GenerateFNameWithNumber("mm", _index, 2, ".bin");
+                        var mmName = SharedMethods.GenerateFNameWithNumber("mm", _index, 2, ".bin");
 
                         generatedVPath = Path.Combine(ZoneDir, zFolderNumPadded, "map", mmName);
 
@@ -110,7 +111,7 @@ namespace DoCPathsGenerator.Dirs
 
                         if (_subTypeVal == 1 && _index != 4)
                         {
-                            generatedDirName = GeneratorHelpers.GenerateFolderNameWithNumber("m", _dependantVal, 3);
+                            generatedDirName = SharedMethods.GenerateFolderNameWithNumber("m", _dependantVal, 3);
                         }
 
                         if (isZoneCnf && !isDone)
@@ -227,8 +228,8 @@ namespace DoCPathsGenerator.Dirs
 
                         if (isZoneEffectFed && !isDone)
                         {
-                            zFolderNumPadded = GeneratorHelpers.GenerateFolderNameWithNumber("z", _zFolderNum, 4);
-                            generatedDirName = GeneratorHelpers.GenerateFolderNameWithNumber("f", _dependantVal, 4);
+                            zFolderNumPadded = SharedMethods.GenerateFolderNameWithNumber("z", _zFolderNum, 4);
+                            generatedDirName = SharedMethods.GenerateFolderNameWithNumber("f", _dependantVal, 4);
                             generatedVPath = Path.Combine(ZoneEffectDir, zFolderNumPadded, generatedDirName, "fer", generatedDirName + ".fed");
 
                             GenerateZonePath(currentChunk, generatedVPath, noPathFile, generatedPathsDict);
@@ -237,7 +238,7 @@ namespace DoCPathsGenerator.Dirs
 
                         if (isZoneLocaleStrBin && !isDone)
                         {
-                            var generatedFName = GeneratorHelpers.ComputeFNameLanguage(_index, "gmap_str");
+                            var generatedFName = SharedMethods.ComputeFNameLanguage(_index, "gmap_str");
 
                             generatedVPath = Path.Combine(ZoneLocaleDir, zFolderNumPadded, generatedFName);
 
@@ -253,7 +254,7 @@ namespace DoCPathsGenerator.Dirs
         private static void GenerateZonePath(string currentChunk, string generatedVPath, string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict)
         {
             LastKey = currentChunk;
-            GeneratorHelpers.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
+            SharedMethods.ProcessGeneratedPath(MoveFiles, generatedVPath, noPathFile, generatedPathsDict, currentChunk, FileCode);
             PathsGenerated++;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoCPathsGenerator.Support;
+using System;
 using System.IO;
 using System.Threading;
 
@@ -10,21 +11,19 @@ namespace DoCPathsGenerator
         {
             Console.WriteLine("Checking....");
             Console.WriteLine("");
-            Thread.Sleep(200);
+            Thread.Sleep(900);
 
             var filesTxtFile = Path.Combine(unpackedKELdir, "file.txt");
+
             if (!File.Exists(filesTxtFile))
             {
-                GeneratorHelpers.ErrorExit("Missing 'file.txt' file in the unpacked KEL directory");
+                SharedMethods.ErrorExit("Missing 'file.txt' file in the unpacked KEL.DAT directory.\nCheck if this file is present in the directory before using this function.");
             }
 
             var missingFilesTxt = Path.Combine(Path.GetDirectoryName(unpackedKELdir), "missing_list.txt");
             var missingCounter = 0;
 
-            if (File.Exists(missingFilesTxt))
-            {
-                File.Delete(missingFilesTxt);
-            }
+            SharedMethods.IfFileFolderExistsDel(missingFilesTxt, true);
 
             using (var filesTxtReader = new StreamReader(filesTxtFile))
             {

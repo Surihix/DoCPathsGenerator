@@ -1,5 +1,6 @@
 ﻿using DoCPathsGenerator.Dirs;
 using DoCPathsGenerator.Filelist;
+using DoCPathsGenerator.Support;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,16 +40,18 @@ namespace DoCPathsGenerator
             Console.WriteLine($"TotalChunks: {filelistVariables.TotalChunks}");
             Console.WriteLine($"No of files: {filelistVariables.TotalFiles}");
             Console.WriteLine("");
-            Console.WriteLine("Preparing to generate....");
-            Console.WriteLine("");
             Thread.Sleep(900);
 
             if (Directory.Exists(GeneratedPathsDir))
             {
-                Directory.Delete(GeneratedPathsDir, true);
+                Console.WriteLine("Detected old generated paths directory. deleting....");
+                Console.WriteLine("");
+
+                SharedMethods.IfFileFolderExistsDel(GeneratedPathsDir, false);
             }
 
-            var noPathsList = new List<(string, uint)>();
+            Directory.CreateDirectory(GeneratedPathsDir);
+
             var generatedPathsDict = new Dictionary<string, List<(uint, string, string)>>();
 
             using (var entriesStream = new MemoryStream())
@@ -58,54 +61,65 @@ namespace DoCPathsGenerator
 
                 using (var entriesReader = new BinaryReader(entriesStream))
                 {
-                    long entriesReadPos = 0;
-                    string fileCodeBinaryVal;
-                    uint mainTypeVal;
+                    // Generate total list of
+                    // noPath files on to the
+                    // txt file
+                    var outNoPathsListTxtFile = Path.Combine(GeneratedPathsDir, "NoPathsList.txt");
+                    SharedMethods.IfFileFolderExistsDel(outNoPathsListTxtFile, true);
 
-                    for (int f = 0; f < filelistVariables.TotalFiles; f++)
+                    using (var processedPathsWriter = new StreamWriter(outNoPathsListTxtFile, true))
                     {
-                        FilelistProcesses.GetCurrentFileEntry(entriesReader, entriesReadPos, filelistVariables);
-                        entriesReadPos += 8;
+                        processedPathsWriter.WriteLine();
 
-                        filelistVariables.ConvertedStringData = filelistVariables.PathString.Split(':');
-                        filelistVariables.MainPath = filelistVariables.ConvertedStringData[3].Replace("/", Convert.ToString(Path.DirectorySeparatorChar));
+                        long entriesReadPos = 0;
+                        string fileCodeBinaryVal;
+                        uint mainTypeVal;
 
-                        if (filelistVariables.MainPath == " ")
+                        for (int f = 0; f < filelistVariables.TotalFiles; f++)
                         {
-                            filelistVariables.NoPathFileCount++;
-                            filelistVariables.DirectoryPath = "noPath";
-                            filelistVariables.FileName = "FILE_" + filelistVariables.NoPathFileCount;
-                            filelistVariables.FullFilePath = Path.Combine(unpackedKELdir, filelistVariables.DirectoryPath, filelistVariables.FileName);
-                            filelistVariables.MainPath = Path.Combine(filelistVariables.DirectoryPath, filelistVariables.FileName);
+                            FilelistProcesses.GetCurrentFileEntry(entriesReader, entriesReadPos, filelistVariables);
+                            entriesReadPos += 8;
 
-                            if (File.Exists(filelistVariables.FullFilePath))
+                            filelistVariables.ConvertedStringData = filelistVariables.PathString.Split(':');
+                            filelistVariables.MainPath = filelistVariables.ConvertedStringData[3].Replace("/", Convert.ToString(Path.DirectorySeparatorChar));
+
+                            if (filelistVariables.MainPath == " ")
                             {
-                                noPathsList.Add(($"FILE_{filelistVariables.NoPathFileCount}", filelistVariables.FileCode));
+                                filelistVariables.NoPathFileCount++;
+                                filelistVariables.DirectoryPath = "noPath";
+                                filelistVariables.FileName = "FILE_" + filelistVariables.NoPathFileCount;
+                                filelistVariables.FullFilePath = Path.Combine(unpackedKELdir, filelistVariables.DirectoryPath, filelistVariables.FileName);
+                                filelistVariables.MainPath = Path.Combine(filelistVariables.DirectoryPath, filelistVariables.FileName);
 
-                                fileCodeBinaryVal = filelistVariables.FileCode.UIntToBinary();
-                                mainTypeVal = fileCodeBinaryVal.BinaryToUInt(0, 8);
+                                processedPathsWriter.WriteLine($"fileName: {filelistVariables.FileName} | fileCode: {filelistVariables.FileCode}");
 
-                                switch (mainTypeVal)
+                                if (File.Exists(filelistVariables.FullFilePath))
                                 {
-                                    // data/zone
-                                    // data/effect/field
-                                    // data/bmd
-                                    case 6:
-                                    case 10:
-                                        ZoneCategory.FileCode = filelistVariables.FileCode;
-                                        ZoneCategory.FileCodeBinary = fileCodeBinaryVal;
-                                        ZoneCategory.ZoneDirType = mainTypeVal;
+                                    fileCodeBinaryVal = filelistVariables.FileCode.UIntToBinary();
+                                    mainTypeVal = fileCodeBinaryVal.BinaryToUInt(0, 8);
 
-                                        ZoneCategory.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
-                                        break;
+                                    switch (mainTypeVal)
+                                    {
+                                        // data/zone
+                                        // data/effect/field
+                                        // data/bmd
+                                        case 6:
+                                        case 10:
+                                            ZoneCategory.FileCode = filelistVariables.FileCode;
+                                            ZoneCategory.FileCodeBinary = fileCodeBinaryVal;
+                                            ZoneCategory.ZoneDirType = mainTypeVal;
 
-                                    // data/event
-                                    case 12:
-                                        EventCategory.FileCode = filelistVariables.FileCode;
-                                        EventCategory.FileCodeBinary = fileCodeBinaryVal;
+                                            ZoneCategory.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
+                                            break;
 
-                                        EventCategory.ProcessEventPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
-                                        break;
+                                        // data/event
+                                        case 12:
+                                            EventCategory.FileCode = filelistVariables.FileCode;
+                                            EventCategory.FileCodeBinary = fileCodeBinaryVal;
+
+                                            EventCategory.ProcessEventPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -118,15 +132,11 @@ namespace DoCPathsGenerator
 
 
             Console.WriteLine("");
-            Console.WriteLine("Generating JSON and txt files....");
+            Console.WriteLine("Generating mappings JSON file....");
 
             // Generate mappings json file
             var outMappingsJsonFile = Path.Combine(GeneratedPathsDir, "FileMappings.json");
-
-            if (File.Exists(outMappingsJsonFile))
-            {
-                File.Delete(outMappingsJsonFile);
-            }
+            SharedMethods.IfFileFolderExistsDel(outMappingsJsonFile, true);
 
             using (var mappingsJsonWriter = new StreamWriter(outMappingsJsonFile, true))
             {
@@ -169,28 +179,6 @@ namespace DoCPathsGenerator
 
                 mappingsJsonWriter.WriteLine("  }");
                 mappingsJsonWriter.WriteLine("}");
-            }
-
-            // Generate total list of noPath files
-            // on to the txt file
-            var outNoPathsListTxtFile = Path.Combine(GeneratedPathsDir, "NoPathsList.txt");
-
-            if (File.Exists(outNoPathsListTxtFile))
-            {
-                File.Delete(outNoPathsListTxtFile);
-            }
-
-            using (var processedPathsWriter = new StreamWriter(outNoPathsListTxtFile, true))
-            {
-                processedPathsWriter.WriteLine("");
-                processedPathsWriter.WriteLine("Total NoPaths: " + noPathsList.Count);
-                processedPathsWriter.WriteLine();
-
-                foreach (var procItem in noPathsList)
-                {
-                    processedPathsWriter.Write("fileName: " + procItem.Item1 + " | ");
-                    processedPathsWriter.WriteLine("fileCode: " + procItem.Item2);
-                }
             }
         }
     }

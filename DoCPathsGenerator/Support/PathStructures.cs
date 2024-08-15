@@ -1,4 +1,4 @@
-﻿namespace DoCPathsGenerator
+﻿namespace DoCPathsGenerator.Support
 {
     internal class PathStructures
     {

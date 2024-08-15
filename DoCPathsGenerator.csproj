@@ -57,6 +57,7 @@
     <Compile Include="DoCPathsGenerator\Filelist\FilelistChunksPrep.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistProcesses.cs" />
     <Compile Include="DoCPathsGenerator\Filelist\FilelistVariables.cs" />
+    <Compile Include="DoCPathsGenerator\Help.cs" />
     <Compile Include="DoCPathsGenerator\Ionic\Crc\CRC32.cs" />
     <Compile Include="DoCPathsGenerator\Ionic\Zlib\Deflate.cs" />
     <Compile Include="DoCPathsGenerator\Ionic\Zlib\DeflateStream.cs" />
@@ -75,8 +76,8 @@
     <Compile Include="DoCPathsGenerator\Extensions\BitOperationHelpers.cs" />
     <Compile Include="DoCPathsGenerator\Categories\ZoneCategory.cs" />
     <Compile Include="DoCPathsGenerator\PathsGenerator.cs" />
-    <Compile Include="DoCPathsGenerator\PathStructures.cs" />
-    <Compile Include="DoCPathsGenerator\GeneratorHelpers.cs" />
+    <Compile Include="DoCPathsGenerator\Support\PathStructures.cs" />
+    <Compile Include="DoCPathsGenerator\Support\SharedMethods.cs" />
     <Compile Include="DoCPathsGenerator\Core.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
