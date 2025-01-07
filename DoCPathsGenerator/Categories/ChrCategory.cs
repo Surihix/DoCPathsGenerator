@@ -18,7 +18,6 @@ namespace DoCPathsGenerator.Categories
         public static void ProcessChrPath(string noPathFile, Dictionary<string, List<(uint, string, string)>> generatedPathsDict, string currentChunk)
         {
             _subTypeVal = FileCodeBinary.BinaryToUInt(8, 8);
-
             _folderNumber = FileCodeBinary.BinaryToUInt(16, 10);
             _index = FileCodeBinary.BinaryToUInt(26, 6);
 
