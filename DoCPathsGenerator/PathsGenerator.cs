@@ -1,4 +1,4 @@
-﻿using DoCPathsGenerator.Dirs;
+﻿using DoCPathsGenerator.Categories;
 using DoCPathsGenerator.Filelist;
 using DoCPathsGenerator.Support;
 using System;
@@ -112,6 +112,26 @@ namespace DoCPathsGenerator
                                             ZoneCategory.ProcessZonePath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
                                             break;
 
+                                        // data/chr/e
+                                        // data/chr/g
+                                        // data/chr/m
+                                        // data/chr/n
+                                        // data/chr/o
+                                        // data/chr/p
+                                        // data/chr/w
+                                        // data/effect/enemy
+                                        // data/effect/ground
+                                        // data/effect/npc
+                                        // data/effect/line
+                                        // data/effect/player
+                                        // data/effect/weapon
+                                        case 7:
+                                            ChrCategory.FileCode = filelistVariables.FileCode;
+                                            ChrCategory.FileCodeBinary = fileCodeBinaryVal;
+
+                                            ChrCategory.ProcessChrPath(filelistVariables.FullFilePath, generatedPathsDict, $"\"Chunk_{filelistVariables.ChunkNumber}\"");
+                                            break;
+
                                         // data/event
                                         case 12:
                                             EventCategory.FileCode = filelistVariables.FileCode;
@@ -154,7 +174,7 @@ namespace DoCPathsGenerator
                         mappingsJsonWriter.Write("               { ");
                         mappingsJsonWriter.Write("\"fileCode\": " + values.Item1 + ", ");
                         mappingsJsonWriter.Write("\"fileName\": " + "\"" + values.Item2 + "\", ");
-                        mappingsJsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3 + "\" ");
+                        mappingsJsonWriter.Write("\"virtualPath\": " + "\"" + values.Item3.Replace("\\", "/") + "\" ");
 
                         if (values == lastValueSet)
                         {

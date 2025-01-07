@@ -5,7 +5,7 @@ using System.IO;
 using static DoCPathsGenerator.PathsGenerator;
 using static DoCPathsGenerator.Support.PathStructures;
 
-namespace DoCPathsGenerator.Dirs
+namespace DoCPathsGenerator.Categories
 {
     internal class ZoneCategory
     {
